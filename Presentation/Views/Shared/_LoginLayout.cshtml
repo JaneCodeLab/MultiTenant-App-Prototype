@@ -1,0 +1,33 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@GeneralVariables.ApplicationName</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" href="~/plugins/icheck-bootstrap/icheck-bootstrap.min.css" />
+    <link rel="stylesheet" href="~/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="~/css/login.css">
+</head>
+
+<body class="hold-transition login-page">
+    <div class="pageContent">
+        <div class="text-center">
+            <a href="/Home">
+                <img alt="logo" style="opacity: .8; height: 60px;" src="~/img/Logo.png" />
+            </a>
+        </div>
+        <div class="login-box">
+            <div class="">
+                <div class="card-body">
+                    @RenderBody()
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="~/plugins/jquery/jquery.min.js"></script>
+    <script src="~/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/dist/js/adminlte.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

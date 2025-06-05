@@ -1,0 +1,126 @@
+﻿@model SysLog
+@{
+    var langEnum = User.GetLoggedInUserLanguageEnum();
+    ViewData["Title"] = SysExpressionHelper.Get(langEnum, ExpressionTypes.SysLog, SysLogExpression.Detail.ToInt());
+    ViewData["Icon"] = "fas fa-user-secret";
+    ViewData["Path"] = new List<PathNavigator> { new PathNavigator { Title = SysExpressionHelper.Get(langEnum, ExpressionTypes.SysLog, SysLogExpression.SysLogs.ToInt()), Address = $"/{ViewContext.GetControllerName()}" }, };
+    ViewData["CurrentMenu"] = SysExpressionHelper.Get(langEnum, ExpressionTypes.SysMenu, SysMenuExpression.AuditLogs.ToInt());
+}
+
+<section class="content pt-3">
+    <div class="container-fluid">
+        <form asp-action="Delete">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card card-info">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <em class="fa fa-list-ol"></em>
+                                @SysExpressionHelper.Get(langEnum, ExpressionTypes.SysLog, SysLogExpression.SysLog.ToInt())
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p>
+                                        <strong class="title">
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.BaseEntity, BaseEntityExpression.CreatedBy.ToInt())
+                                        </strong>
+                                        :
+                                        <strong class="value">
+                                            @Html.DisplayFor(model => model.CreatedBy) ( @Html.DisplayFor(model => model.CreatedAt) )
+                                        </strong>
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p>
+                                        <strong class="title">
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SysHelp, SysLogExpression.EntityName.ToInt())
+                                        </strong>
+                                        :
+                                        <strong class="value">
+                                            @Html.DisplayFor(model => model.EntityName)
+                                        </strong>
+                                    </p>
+                                </div>
+                            </div>
+                            <hr />
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p>
+                                        <strong class="title">
+                                            CrudType
+                                        </strong>
+                                        :
+                                        <strong class="value">
+                                            @Html.DisplayFor(model => model.CrudType)
+                                        </strong>
+                                    </p>
+                                </div>
+                            </div>
+                            <hr />
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <p>
+                                        <strong class="title">
+                                            Content
+                                        </strong>
+                                    </p>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <input id="JsonContent" class="jsoncontentJsonContent" type="hidden" value="@Model.Entity" />
+                                            <pre id="json-displayJsonContent" style="padding: 30px;"></pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="card-footer">
+                            <input type="hidden" asp-for="Id" />
+                            <div class="float-right">
+                                <a class="btn btn-outline-info btn-footer" asp-action="Index">
+                                    <em class="fa fa-times mr-2"></em>
+                                    @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Return_To_List.ToInt())
+                                </a>
+                            </div>
+                            <a href="#" title="@SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Help.ToInt())">
+                                <em class="fa fa-info-circle"></em>
+                            </a>
+                            <a href="#" title="@SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Faq.ToInt())" class="ml-2">
+                                <em class="fa fa-question-circle"></em>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+
+
+@section Scripts {
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="~/plugins/json-editor/jquery.json-editor.min.js"></script>
+
+    <script type="text/javascript">
+        $(function () {
+            $("input.jsoncontentJsonContent").each(function () {
+                var editor = new JsonEditor('#json-displayJsonContent', getJson($(this).val()));
+            });
+        });
+        function getJson(content) {
+            try {
+                if (content) {
+                    return JSON.parse(content);
+                }
+                else {
+                    return {};
+                }
+            } catch (ex) {
+                console.log('Wrong JSON Format: ' + ex);
+            }
+        }
+    </script>
+}

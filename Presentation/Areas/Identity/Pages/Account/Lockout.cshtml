@@ -1,0 +1,13 @@
+﻿@page
+@model LockoutModel
+@{
+    ViewData["Title"] = SysExpressionHelper.Get(Language.English, ExpressionTypes.General, GeneralExpression.Failed_Login_Title.ToInt());
+    Layout = "_LoginLayout";
+}
+
+<header>
+    <p class="text-info text-center">
+        <em class="fas fa-lock text-lg text-info"></em>
+        @SysExpressionHelper.Get(Language.English, ExpressionTypes.General, GeneralExpression.Failed_Login_Description.ToInt())
+    </p>
+</header>

@@ -1,0 +1,159 @@
+﻿@{
+    ViewData["Title"] = SysExpressionHelper.Get(User.GetLoggedInUserLanguageEnum(), ExpressionTypes.General, GeneralExpression.Welcome.ToInt());
+}
+
+
+<section class="content pb-5 pt-3">
+    <div class="container-fluid">
+        <p class="alert alert-warning">
+            <i class="fa-solid fa-circle-info"></i>
+            @SysExpressionHelper.Get(User.GetLoggedInUserLanguageEnum(), ExpressionTypes.General, GeneralExpression.Admin_Dashboard_Disclaimer.ToInt())
+        </p>
+        @if (User.IsInRole(Roles.Admin))
+        {
+            <p class="alert alert-light">
+                <i class="fa-solid fa-circle-info"></i>
+                @SysExpressionHelper.Get(User.GetLoggedInUserLanguageEnum(), ExpressionTypes.General, GeneralExpression.Admin_Dashboard_Explanation.ToInt())
+            </p>
+            <div class="row">
+                @foreach (var item in (List<VmTenant>)ViewBag.TenantList)
+                {
+                    if (item.Active)
+                    {
+                        <div class="col-md-4">
+                            <div class="card card-success">
+                                <div class="card-header">
+                                    <h3 class="card-title">
+                                        <i class="fa fa-database"></i>
+                                        <strong>
+                                            @item.Title
+                                        </strong>
+                                    </h3>
+                                    <div class="card-tools">
+                                        <i class="fas fa-signal"></i>
+                                        @SysExpressionHelper.Get(User.GetLoggedInUserLanguageEnum(), ExpressionTypes.General, GeneralExpression.Online.ToInt())
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="col-md-12">
+                                        <div class="progress-group">
+                                            @SysExpressionHelper.Get(User.GetLoggedInUserLanguageEnum(), ExpressionTypes.Department, DepartmentExpression.Departments.ToInt())
+                                            <span class="float-right"><b>@item.DepartmentCount</b>/10</span>
+                                            <div class="progress progress-sm">
+                                                <div class="progress-bar bg-primary" style="width: @(item.DepartmentCount*100/10)%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="progress-group">
+                                            @SysExpressionHelper.Get(User.GetLoggedInUserLanguageEnum(), ExpressionTypes.SysCustomUser, SysCustomUserExpression.CustomUsers.ToInt())
+                                            <span class="float-right"><b>@item.UserCount</b>/20</span>
+                                            <div class="progress progress-sm">
+                                                <div class="progress-bar bg-dark" style="width: @(item.UserCount*100/20)%"></div>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="progress-group">
+                                            @SysExpressionHelper.Get(User.GetLoggedInUserLanguageEnum(), ExpressionTypes.Customer, CustomerExpression.Customers.ToInt())
+                                            <span class="float-right"><b>@item.CustomerCount</b>/10</span>
+                                            <div class="progress progress-sm">
+                                                <div class="progress-bar bg-danger" style="width: @(item.CustomerCount*100/10)%"></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="progress-group">
+                                            @SysExpressionHelper.Get(User.GetLoggedInUserLanguageEnum(), ExpressionTypes.Project, ProjectExpression.Projects.ToInt())
+                                            <span class="float-right"><b>@item.ProjectCount</b>/10</span>
+                                            <div class="progress progress-sm">
+                                                <div class="progress-bar bg-success" style="width: @(item.ProjectCount*100/10)%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="progress-group">
+                                            @SysExpressionHelper.Get(User.GetLoggedInUserLanguageEnum(), ExpressionTypes.Sprint, SprintExpression.Sprints.ToInt())
+                                            <span class="float-right"><b>@item.SprintCount</b>/100</span>
+                                            <div class="progress progress-sm">
+                                                <div class="progress-bar bg-warning" style="width: @(item.SprintCount*100/100)%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="progress-group">
+                                            @SysExpressionHelper.Get(User.GetLoggedInUserLanguageEnum(), ExpressionTypes.SprintTask, SprintTaskExpression.SprintTasks.ToInt())
+                                            <span class="float-right"><b>@item.SprintTaskCount</b>/500</span>
+                                            <div class="progress progress-sm">
+                                                <div class="progress-bar bg-info" style="width: @(item.SprintTaskCount*100/500)%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="col-md-4">
+                            <div class="card card-danger">
+                                <div class="card-header">
+                                    <h3 class="card-title">
+                                        <i class="fa fa-database"></i>
+                                        <strong>
+                                            @item.Title
+                                        </strong>
+                                    </h3>
+                                    <div class="card-tools">
+                                        <i class="fas fa-triangle-exclamation"></i>
+                                        @SysExpressionHelper.Get(User.GetLoggedInUserLanguageEnum(), ExpressionTypes.General, GeneralExpression.Offline.ToInt())
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="col-md-12" style="color:silver !important">
+                                        <div class="progress-group">
+                                            @SysExpressionHelper.Get(User.GetLoggedInUserLanguageEnum(), ExpressionTypes.Department, DepartmentExpression.Departments.ToInt())
+                                            <span class="float-right"><b>@item.DepartmentCount</b>/10</span>
+                                            <div class="progress progress-sm">
+                                                <div class="progress-bar bg-primary" style="width: @(item.DepartmentCount*100/10)%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="progress-group">
+                                            @SysExpressionHelper.Get(User.GetLoggedInUserLanguageEnum(), ExpressionTypes.SysCustomUser, SysCustomUserExpression.CustomUsers.ToInt())
+                                            <span class="float-right"><b>@item.UserCount</b>/20</span>
+                                            <div class="progress progress-sm">
+                                                <div class="progress-bar bg-dark" style="width: @(item.UserCount*100/20)%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="progress-group">
+                                            @SysExpressionHelper.Get(User.GetLoggedInUserLanguageEnum(), ExpressionTypes.Customer, CustomerExpression.Customers.ToInt())
+                                            <span class="float-right"><b>@item.CustomerCount</b>/10</span>
+                                            <div class="progress progress-sm">
+                                                <div class="progress-bar bg-danger" style="width: @(item.CustomerCount*100/10)%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="progress-group">
+                                            @SysExpressionHelper.Get(User.GetLoggedInUserLanguageEnum(), ExpressionTypes.Project, ProjectExpression.Projects.ToInt())
+                                            <span class="float-right"><b>@item.ProjectCount</b>/10</span>
+                                            <div class="progress progress-sm">
+                                                <div class="progress-bar bg-success" style="width: @(item.ProjectCount*100/10)%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="progress-group">
+                                            @SysExpressionHelper.Get(User.GetLoggedInUserLanguageEnum(), ExpressionTypes.Sprint, SprintExpression.Sprints.ToInt())
+                                            <span class="float-right"><b>@item.SprintCount</b>/100</span>
+                                            <div class="progress progress-sm">
+                                                <div class="progress-bar bg-warning" style="width: @(item.SprintCount*100/100)%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="progress-group">
+                                            @SysExpressionHelper.Get(User.GetLoggedInUserLanguageEnum(), ExpressionTypes.SprintTask, SprintTaskExpression.SprintTasks.ToInt())
+                                            <span class="float-right"><b>@item.SprintTaskCount</b>/500</span>
+                                            <div class="progress progress-sm">
+                                                <div class="progress-bar bg-info" style="width: @(item.SprintTaskCount*100/500)%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        }
+    </div>
+</section>
+

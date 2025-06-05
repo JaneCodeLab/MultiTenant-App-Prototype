@@ -1,0 +1,134 @@
+﻿@model SprintTask
+@{
+    var langEnum = User.GetLoggedInUserLanguageEnum();
+    ViewData["Title"] = SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Create.ToInt());
+    ViewData["Icon"] = "fas fa-user-secret";
+    ViewData["Path"] = new List<PathNavigator> { new PathNavigator { Title = ViewBag.PageTitle, Address = $"/{ViewBag.CallBackController}", } };
+    ViewData["CurrentMenu"] = ViewBag.Menu;
+}
+
+<section class="content pt-3">
+    <div class="container-fluid">
+        <form asp-action="Create" class="needs-validation" novalidate>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card card-info">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <em class="fa fa-users"></em>
+                                @SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Create.ToInt())
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <input type="hidden" asp-for="Id" />
+                            <input type="hidden" asp-for="SprintId" />
+                            <input type="hidden" asp-for="IssueId" />
+                            <div class="col-12">
+                                <div class="row">
+                                    <div class="form-group col-2">
+                                        <label class="control-label" for="Code">
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Code.ToInt())
+                                        </label>
+                                        <input asp-for="Code" class="form-control" required autocomplete="off" />
+                                        <div class="invalid-feedback text-size-10">
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.BaseEntity, BaseEntityExpression.Requiered_Validation_Message.ToInt() , (ExpressionParamConstants.Field, SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Code.ToInt())))
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-2">
+                                        <label class="control-label" for="Priority">
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Priority.ToInt())
+                                        </label>
+                                        <select asp-for="Priority" asp-items="@Html.GetEnumSelectList(typeof(Priority))" class="form-control">
+                                        </select>
+                                        <div class="invalid-feedback text-size-10">
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.BaseEntity, BaseEntityExpression.Requiered_Validation_Message.ToInt() , (ExpressionParamConstants.Field, SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Priority.ToInt())))
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-2">
+                                        <label class="control-label" for="Status">
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Status.ToInt())
+                                        </label>
+                                        <select asp-for="Status" asp-items="@Html.GetEnumSelectList(typeof(ProgressStatus))" class="form-control">
+                                        </select>
+                                        <div class="invalid-feedback text-size-10">
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.BaseEntity, BaseEntityExpression.Requiered_Validation_Message.ToInt() , (ExpressionParamConstants.Field, SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Status.ToInt())))
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-3">
+                                        <label class="control-label" for="TaskType">
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.TaskType.ToInt())
+                                        </label>
+                                        <select asp-for="TaskType" asp-items="@Html.GetEnumSelectList(typeof(TaskType))" class="form-control">
+                                        </select>
+                                        <div class="invalid-feedback text-size-10">
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.BaseEntity, BaseEntityExpression.Requiered_Validation_Message.ToInt() , (ExpressionParamConstants.Field, SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.TaskType.ToInt())))
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-3">
+                                        <label class="control-label" for="ProjectId">
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.ProjectId.ToInt())
+                                        </label>
+                                        <select asp-for="ProjectId" asp-items="ViewBag.ProjectList" class="form-control">
+                                        </select>
+                                        <div class="invalid-feedback text-size-10">
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.BaseEntity, BaseEntityExpression.Requiered_Validation_Message.ToInt() , (ExpressionParamConstants.Field, SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.ProjectId.ToInt())))
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-8">
+                                        <label class="control-label" for="Title">
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Title.ToInt())
+                                        </label>
+                                        <input asp-for="Title" class="form-control" required autocomplete="off" />
+                                        <div class="invalid-feedback text-size-10">
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.BaseEntity, BaseEntityExpression.Requiered_Validation_Message.ToInt() , (ExpressionParamConstants.Field, SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Title.ToInt())))
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-2">
+                                        <label class="control-label" for="Deadline">
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Deadline.ToInt())
+                                        </label>
+                                        <input asp-for="Deadline" type="date" class="form-control" required autocomplete="off" />
+                                        <div class="invalid-feedback text-size-10">
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.BaseEntity, BaseEntityExpression.Requiered_Validation_Message.ToInt() , (ExpressionParamConstants.Field, SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Deadline.ToInt())))
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-2">
+                                        <label class="control-label" for="Estimate">
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Estimate.ToInt())
+                                        </label>
+                                        <input asp-for="Estimate" type="number" class="form-control" required autocomplete="off" />
+                                        <div class="invalid-feedback text-size-10">
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.BaseEntity, BaseEntityExpression.Requiered_Validation_Message.ToInt() , (ExpressionParamConstants.Field, SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Estimate.ToInt())))
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <textarea asp-for="Description" class="summernote" autocomplete="off" >
+                                          </textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer ">
+                            <div class="float-right">
+                                <a class="btn btn-outline-info btn-footer" asp-action="Index" asp-controller="@ViewBag.CallBackController">
+                                    <em class="fa fa-times mr-2"></em>
+                                    @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Cancel.ToInt())
+                                </a>
+                                <button type="submit" class="btn btn-info btn-footer">
+                                    <em class="fa fa-check mr-2"></em>
+                                    @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Save.ToInt())
+                                </button>
+                            </div>
+                            <a asp-controller="SysAssistance" asp-action="Help" asp-route-controllerName="SprintTask" asp-route-actionName="Create" title="@SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Help.ToInt())" class="mr-2" style="color:#036b7c"><em class="fa fa-info-circle"></em></a>
+                            <a asp-controller="SysAssistance" asp-action="Faq" asp-route-controllerName="SprintTask" asp-route-actionName="Create" title="@SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Faq.ToInt())" class="mr-2" style="color:#036b7c"><em class="fa fa-question-circle"></em></a>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>

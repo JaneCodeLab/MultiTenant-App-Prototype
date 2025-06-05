@@ -1,0 +1,1 @@
+ namespace ApplicationCore.DomainModel;  public enum TaskType {     BugFix = 1,     Implementation = 2,     Analyze = 3,     Meeting = 4,     QualityControl = 5,     WorkShop = 6,     Test = 7,     Deployment = 8,     Support = 9,     Training = 10,     Documentation = 11,     Research = 12, }

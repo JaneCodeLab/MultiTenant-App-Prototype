@@ -1,0 +1,321 @@
+﻿@model ViewListModel<DepartmentRole, BaseFilter>
+@{
+    var langEnum = User.GetLoggedInUserLanguageEnum();
+    ViewData["Title"] = SysExpressionHelper.Get(langEnum, ExpressionTypes.DepartmentRole, DepartmentRoleExpression.DepartmentRoles.ToInt());
+    ViewData["Icon"] = "fas fa-user-secret";
+    ViewData["Filter"] = Model.Filter;
+    ViewData["CurrentMenu"] = SysExpressionHelper.Get(langEnum, ExpressionTypes.SysMenu, SysMenuExpression.DepartmentRoles.ToInt());
+
+    var locked_lable = SysExpressionHelper.Get(langEnum, ExpressionTypes.BaseEntity, BaseEntityExpression.Locked.ToInt());
+    var Change_Status_lable = SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Change_Status.ToInt());
+    var Inactive_lable = SysExpressionHelper.Get(langEnum, ExpressionTypes.BaseEntity, BaseEntityExpression.Inactive.ToInt());
+    var Edit_lable = SysExpressionHelper.Get(langEnum, ExpressionTypes.DepartmentRole, DepartmentRoleExpression.Edit.ToInt());
+    var Delete_lable = SysExpressionHelper.Get(langEnum, ExpressionTypes.DepartmentRole, DepartmentRoleExpression.Delete.ToInt());
+    var User_TimeZone = User.GetLoggedInUserTimezoneId();
+    var OnlineUserId = User.GetLoggedInUserId();
+}
+<section class="content pt-3">
+    <div class="container-fluid">
+        @if (!Model.Filter.IsNullOrEmpty())
+        {
+            <div class="card card-light custom-filter-header">
+                <div class="card-header advanced-search-header">
+                    @foreach (var item in @Model.Filter.GetFields())
+                    {
+                        if (item.GetValue(Model.Filter) != null)
+                        {
+                            if (item.PropertyType == typeof(bool) || item.PropertyType == typeof(Nullable<bool>))
+                            {
+                                <a onclick="clean_filter(event,'@item.Name')" class="badge badge-light text-xs text-dark text-bold">
+                                    @item.GetLable(langEnum,ExpressionTypes.BaseEntity)
+                                    :
+                                    @((item.GetValue(Model.Filter) as bool?) == true ? SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Yes.ToInt()) : SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.No.ToInt()))
+                                    <span class="text-danger ml-2"><em class="fa fa-times"></em></span>
+                                </a>
+                            }
+                            else if (item.PropertyType == typeof(DateTime) || item.PropertyType == typeof(Nullable<DateTime>))
+                            {
+                                <a onclick="clean_filter(event,'@item.Name')" class="badge badge-light text-xs text-dark text-bold">
+                                    @item.GetLable(langEnum,ExpressionTypes.BaseEntity)
+                                    :
+                                    @((item.GetValue(Model.Filter) as DateTime?).Value.ToShortDateString())
+                                    <span class="text-danger ml-2"><em class="fa fa-times"></em></span>
+                                </a>
+                            }
+                        }
+                    }
+
+                    <a style="float:right" href="#" onclick="clear_all_filter()" title="@SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Clear_All_Filters.ToInt())" class="ml-3">
+                        <em class="fas fa-trash mr-1"></em>
+                    </a>
+                </div>
+            </div>
+        }
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <a class="btn btn-danger btn-advanced-search" data-widget="control-sidebar" data-slide="true" href="#" role="button">
+                            <em class="fa fa-search mr-2"> </em>
+                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Advanced_Search.ToInt())
+                        </a>
+                        @if (Model.Records.Any())
+                        {
+                            <table id="CustomDataTable" summary="forHelp" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th id="FirstColumn" class="no-sort no-vis state-column">
+                                        </th>
+                                        <th id="CodeColumn" class="colvis">
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.DepartmentRole, DepartmentRoleExpression.Title.ToInt())
+                                        </th>
+                                        <th id="CreatedAtColumn" style="width:140px;">
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.BaseEntity, BaseEntityExpression.CreatedAt.ToInt())
+                                        </th>
+                                        <th id="CreatedByColumn" style="width:100px;">
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.BaseEntity, BaseEntityExpression.CreatedBy.ToInt())
+                                        </th>
+                                        <th id="LastColumn" style="width:100px;text-align:center" class="no-sort no-vis">
+                                            <a asp-action="Create" style="color:forestgreen" title="@SysExpressionHelper.Get(langEnum, ExpressionTypes.DepartmentRole, DepartmentRoleExpression.Create.ToInt())"
+                                               onclick="event.preventDefault();openModal('','')">
+                                                <em class="fa-solid fa-square-plus"></em>
+                                                <span class="text-xs text-bold">
+                                                    @SysExpressionHelper.Get(langEnum, ExpressionTypes.DepartmentRole, DepartmentRoleExpression.Create.ToInt())
+                                                </span>
+                                            </a>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.Records)
+                                    {
+                                        <tr style="@(item.Locked ? "background-color:#fff9e8" : (!item.Active ? "background-color:#f5eaec" : ""))">
+                                            <td class="state-column">
+                                                @if (item.Locked)
+                                                {
+                                                    <span class="fa fa-lock btn-custom-lock" title="@locked_lable"></span>
+                                                }
+                                                else
+                                                {
+                                                    @if (item.Active)
+                                                    {
+                                                        <a title="@Change_Status_lable" asp-action="ChangeState" asp-route-id="@item.Id" asp-route-activate="true" class="fas fa-toggle-on text-success"></a>
+                                                    }
+                                                    else
+                                                    {
+                                                        <a title="@Change_Status_lable" asp-action="ChangeState" asp-route-id="@item.Id" asp-route-activate="false" class="fas fa-toggle-off btn-custom-Inactive"></a>
+                                                    }
+                                                }
+                                            </td>
+                                            <td>
+                                                @item.Title
+                                            </td>
+                                            <td>
+                                                @item.CreatedAt.GetLocalDateTime(User_TimeZone)
+                                            </td>
+                                            <td>
+                                                @item.CreatedBy
+                                            </td>
+                                            <td style="width:80px;text-align:center">
+                                                @if (item.Locked)
+                                                {
+                                                    <span class="fa fa-lock btn-custom-lock" title="@locked_lable"></span>
+                                                    @if (item.Owner == OnlineUserId)
+                                                    {
+                                                        <a asp-action="ChangeLock" asp-route-id="@item.Id" asp-route-lockStatus="true" class="text-xs text-bold">
+                                                            @locked_lable
+                                                        </a>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-xs text-bold">
+                                                            @locked_lable
+                                                        </span>
+                                                    }
+                                                }
+                                                else if (!item.Active)
+                                                {
+                                                    <span class="fa-solid fa-eye-slash btn-custom-Inactive" title="@Inactive_lable"></span>
+                                                    <span class="text-xs text-bold">
+                                                        @Inactive_lable
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <a title="@Edit_lable" class="mr-2" style="color:#036b7c" onclick="event.preventDefault();openModal('@item.Id','@item.Title')"><span class="fa-solid fa-pencil"></span></a>
+                                                    <a title="@Delete_lable" style="color:#b90a2b" onclick="event.preventDefault();deleteConfirm('@item.Id')"><em class="fa-solid fa-trash-can"></em></a>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                        else
+                        {
+                            <div class="text-center">
+                                <img alt="searching" src="~/img/searching.gif" />
+                                <p style="font-size:larger;font-weight:bolder;color: #abbcca;">
+                                    @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Sorry_No_Result_Found.ToInt())
+                                </p>
+                            </div>
+                        }
+                    </div>
+                    <div class="card-footer">
+                        @if (!Model.Records.Any())
+                        {
+                            <div class="float-right">
+                                <a onclick="event.preventDefault();openModal('','','')">
+                                    <em class="fa fa-plus mr-1"></em>
+                                    @SysExpressionHelper.Get(langEnum, ExpressionTypes.DepartmentRole, DepartmentRoleExpression.Create.ToInt())
+                                </a>
+                            </div>
+                        }
+                        <a asp-controller="SysAssistance" asp-action="Help" asp-route-controllerName="Project" asp-route-actionName="Index" title="@SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Help.ToInt())" class="mr-2" style="color:#036b7c"><em class="fa fa-info-circle"></em></a>
+                        <a asp-controller="SysAssistance" asp-action="Faq" asp-route-controllerName="Project" asp-route-actionName="Index" title="@SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Faq.ToInt())" class="mr-2" style="color:#036b7c"><em class="fa fa-question-circle"></em></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<aside class="control-sidebar control-sidebar-dark text-sm" style="overflow:auto">
+    <form asp-action="Index">
+        <input type="hidden" asp-for="Filter.ClearAll" class="filter" id="Filter_ClearAll" />
+        <input type="hidden" asp-for="Filter.ItemRemoved" class="filter" id="Filter_ItemRemoved" />
+        <div class="row" style="margin:10px;">
+            <div class="row">
+                <div class="col-12 pt-3 text-center">
+                    <h4>
+                        <em class="fa fa-search"></em>
+                        @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Advanced_Search.ToInt())
+                    </h4>
+                    <hr />
+                </div>
+                <div class="col-md-12">
+                    <div class="row">
+                        @foreach (var item in @Model.Filter.GetFields().OrderBy(o => o.PropertyType.FullName).ThenBy(o => o.Name))
+                        {
+                            if (item.PropertyType == typeof(bool) || item.PropertyType == typeof(Nullable<bool>))
+                            {
+                                var value = (item.GetValue(Model.Filter) as bool?);
+                                <div class="col-12 mt-2">
+                                    <div class="form-group">
+                                        <label class="control-label mb-0 ml-2" for="Filter_@item.Name">
+                                            @item.GetLable(langEnum,ExpressionTypes.BaseEntity)
+                                        </label>
+                                        <select asp-for="@value" id="Filter_@item.Name" name="Filter.@item.Name" class="form-control">
+                                            <option selected="selected" value="">
+                                                @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Please_Select.ToInt())
+                                            </option>
+                                            <option value="true">
+                                                @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Yes.ToInt())
+                                            </option>
+                                            <option value="false">
+                                                @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.No.ToInt())
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                            }
+                            else if (item.PropertyType == typeof(DateTime) || item.PropertyType == typeof(Nullable<DateTime>))
+                            {
+                                var value = (item.GetValue(Model.Filter) as DateTime?);
+                                <div class="col-12 mt-2">
+                                    <div class="form-group">
+                                        <label class="control-label mb-0 ml-2" for="Filter_@item.Name">
+                                            @item.GetLable(langEnum,ExpressionTypes.BaseEntity)
+                                        </label>
+                                        <input asp-for="@value" id="Filter_@item.Name" name="Filter.@item.Name" class="form-control" type="date" />
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+                <div class="col-md-6 mt-4">
+                    <div class="form-group">
+                        <button id="searchButton" type="submit" class="btn btn-info btn-block">
+                            <em class="fas fa-search"></em>
+                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Search.ToInt())
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-6 mt-4">
+                    <div class="form-group">
+                        <a class="btn btn-danger btn-block" data-widget="control-sidebar" data-slide="true" href="#" role="button">
+                            <em class="fa fa-times"> </em>
+                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Close.ToInt())
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        @if (!Model.Filter.IsNullOrEmpty())
+                        {
+                            <a title="@SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Clear_All_Filters.ToInt())" onclick="clear_all_filter()" class="btn btn-secondary btn-block">
+                                <em class="fas fa-trash mr-2"></em>
+                                @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Clear_All_Filters.ToInt())
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</aside>
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-dark-info text-white">
+                <h5 class="modal-title" id="modalTitle">
+                    @SysExpressionHelper.Get(langEnum, ExpressionTypes.DepartmentRole, DepartmentRoleExpression.Create.ToInt())
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form asp-action="Save" id="saveForm" class="needs-validation" novalidate>
+                <input name="Id" id="Id" type="hidden" class="form-control" required autocomplete="off" />
+                <input name="DepartmentId" id="DepartmentId" value="@ViewBag.DepartmentId" type="hidden" class="form-control" required autocomplete="off" />
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="row">
+                                <div class="form-group col-12">
+                                    <label class="control-label" for="Title">
+                                        @SysExpressionHelper.Get(langEnum, ExpressionTypes.DepartmentRole, DepartmentRoleExpression.Title.ToInt())
+                                    </label>
+                                    <input name="Title" id="Title" class="form-control" required autocomplete="off" />
+                                    <div class="invalid-feedback text-size-10" for="Title">
+                                        @SysExpressionHelper.Get(langEnum, ExpressionTypes.BaseEntity, BaseEntityExpression.Requiered_Validation_Message.ToInt() , (ExpressionParamConstants.Field, SysExpressionHelper.Get(langEnum,ExpressionTypes.DepartmentRole,DepartmentRoleExpression.Title.ToInt())))
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="searchButton" type="submit" class="btn btn-info btn-footer float-right">
+                        <em class="fas fa-plus mr-2"></em>
+                        @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Save.ToInt())
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script asp-append-version="true" src="~/js/pages/department_role.js"></script>
+    <script>
+        var createTitle = '@SysExpressionHelper.Get(langEnum, ExpressionTypes.DepartmentRole, DepartmentExpression.Create.ToInt())';
+        var editTitle = '@SysExpressionHelper.Get(langEnum, ExpressionTypes.DepartmentRole, DepartmentExpression.Edit.ToInt())';
+        var deleteMboxTitle = '@SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Delete.ToInt())';
+        var sureToDelete = '@SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Sure_To_Delete.ToInt())';
+        var yesDeleteButton = '@SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Yes_I_Am_Sure_To_Delete_It.ToInt())';
+        var noButton = '@SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.No.ToInt())';
+    </script>
+}

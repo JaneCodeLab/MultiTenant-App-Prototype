@@ -1,0 +1,54 @@
+﻿@page
+@model LoginModel
+
+@{
+    Layout = "_LoginLayout";
+}
+@using Infrastructure
+@using Microsoft.Extensions.Configuration
+@using Microsoft.Extensions.Options
+
+<form id="account" method="post">
+    <div asp-validation-summary="All" class="text-danger text-center">
+    </div>
+    <div class="input-group mb-3">
+        <div class="input-group-prepend">
+            <div class="input-group-text">
+                <span class="fas fa-envelope"></span>
+            </div>
+        </div>
+        <input asp-for="Input.Email" type="email" class="form-control" placeholder="Email" />
+    </div>
+    <div class="input-group mb-3">
+        <div class="input-group-prepend">
+            <div class="input-group-text">
+                <span class="fas fa-lock"></span>
+            </div>
+        </div>
+        <input asp-for="Input.Password" type="password" class="form-control" placeholder="Password" />
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="icheck-primary">
+                <input id="remember" asp-for="Input.RememberMe" />
+                <label for="remember">
+                    Remember Me
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" style="margin-top:20px;">
+        <div class="col-12">
+            <button type="submit" class="btn btn-block btn-dark" >Log in</button>
+        </div>
+    </div>
+
+    <div class="form-group mt-1">
+        <a style="color: #53517a" id="forgot-password" asp-page="./ForgotPassword">Forgot your password?</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

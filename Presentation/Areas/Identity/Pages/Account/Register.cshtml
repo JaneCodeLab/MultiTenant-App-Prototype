@@ -1,0 +1,57 @@
+﻿@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Register";
+    Layout = "_LoginLayout";
+}
+<form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <span asp-validation-for="Input.FirstName" class="text-danger"></span>
+    <div class="input-group mb-3">
+        <input asp-for="Input.FirstName" type="text" class="form-control" placeholder="FirstName" />
+        <div class="input-group-append">
+            <div class="input-group-text">
+                <span class="fas fa-id-card-alt"></span>
+            </div>
+        </div>
+    </div>
+
+    <span asp-validation-for="Input.LastName" class="text-danger"></span>
+    <div class="input-group mb-3">
+        <input asp-for="Input.LastName" type="text" class="form-control" placeholder="LastName" />
+        <div class="input-group-append">
+            <div class="input-group-text">
+                <span class="fas fa-address-card"></span>
+            </div>
+        </div>
+    </div>
+    <span asp-validation-for="Input.Email" class="text-danger"></span>
+    <div class="input-group mb-3">
+        <input asp-for="Input.Email" type="email" class="form-control" placeholder="Email" />
+        <div class="input-group-append">
+            <div class="input-group-text">
+                <span class="fas fa-envelope"></span>
+            </div>
+        </div>
+    </div>
+    <span asp-validation-for="Input.Password" class="text-danger"></span>
+    <div class="input-group mb-3">
+        <input asp-for="Input.Password" type="password" class="form-control" placeholder="Password" />
+        <div class="input-group-append">
+            <div class="input-group-text">
+                <span class="fas fa-lock"></span>
+            </div>
+        </div>
+    </div>
+    <div class="input-group mb-3">
+        <input asp-for="Input.ConfirmPassword" type="password" class="form-control" placeholder="ConfirmPassword" />
+        <div class="input-group-append">
+            <div class="input-group-text">
+                <span class="fas fa-lock"></span>
+            </div>
+        </div>
+    </div>
+    <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
+    <a href="/" class="text-center">I already have a membership</a>
+</form>

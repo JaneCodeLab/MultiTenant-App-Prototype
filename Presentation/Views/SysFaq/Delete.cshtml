@@ -1,0 +1,107 @@
+﻿@model SysFaq
+@{
+    var langEnum = User.GetLoggedInUserLanguageEnum();
+    ViewData["Title"] = SysExpressionHelper.Get(langEnum, ExpressionTypes.SysHelp, SysHelpExpression.SysHelp_Delete.ToInt());
+    ViewData["Icon"] = "fas fa-user-secret";
+    ViewData["Path"] = new List<PathNavigator> { new PathNavigator { Title = SysExpressionHelper.Get(langEnum, ExpressionTypes.SysFaq, SysFaqExpression.SysFaqs.ToInt()), Address = $"/{ViewContext.GetControllerName()}" }, };
+    ViewData["CurrentMenu"] = SysExpressionHelper.Get(langEnum, ExpressionTypes.SysMenu, SysMenuExpression.Faq.ToInt());
+}
+
+<section class="content pt-3">
+    <div class="container-fluid">
+        <form asp-action="Delete">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card card-info">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <em class="fa fa-users"></em>
+                                @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Sure_To_Delete.ToInt())
+
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p>
+                                        <strong class="title">
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.BaseEntity, BaseEntityExpression.CreatedBy.ToInt())
+                                        </strong>
+                                        <strong class="value">
+                                            @Html.DisplayFor(model => model.CreatedBy) (@Html.DisplayFor(model => model.CreatedAt))
+                                        </strong>
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p>
+                                        <strong class="title">
+                                            @SysExpressionHelper.Get(langEnum,ExpressionTypes.SysCustomUser,SysCustomUserExpression.CustomUser_Language.ToInt())
+                                        </strong>
+                                        <strong class="value">
+                                            @Html.DisplayFor(model => model.Language)
+                                        </strong>
+                                    </p>
+                                </div>
+                            </div>
+                            <hr />
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p>
+                                        <strong class="title">
+                                            @SysExpressionHelper.Get(langEnum,ExpressionTypes.SysFaq ,SysFaqExpression.SysFaq_ControllerName.ToInt())
+                                            (@SysExpressionHelper.Get(langEnum,ExpressionTypes.SysFaq ,SysFaqExpression.SysFaq_ViewName.ToInt())):
+                                        </strong>
+                                        <strong class="value">
+                                            @Html.DisplayFor(model => model.ControllerName) (@Html.DisplayFor(model => model.ViewName))
+                                        </strong>
+                                    </p>
+                                </div>
+                            </div>
+                            <hr />
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <p>
+                                        <strong class="title">
+                                            Question:
+                                        </strong>
+                                        <strong class="value">
+                                            @Html.DisplayFor(model => model.Question)
+                                        </strong>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <p>
+                                        <strong class="title">
+                                            Answer:
+                                        </strong>
+                                    </p>
+                                    <div class="callout callout-info">
+                                        @Html.Raw(Model.Answer)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <input type="hidden" asp-for="Id" />
+                            <div class="float-right">
+                                <a class="btn btn-outline-info btn-footer" asp-action="Index">
+                                    <em class="fa fa-times mr-2"></em>
+                                    @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.No.ToInt())
+                                </a>
+                                <button type="submit" class="btn btn-info btn-footer">
+                                    <em class="fa fa-check mr-2"></em>
+                                    @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Yes_I_Am_Sure_To_Delete_It.ToInt())
+                                </button>
+                            </div>
+                            <a asp-controller="SysAssistance" asp-action="Help" asp-route-controllerName="SysFaq" asp-route-actionName="Detail" title="@SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Help.ToInt())" class="mr-2" style="color:#036b7c"><em class="fa fa-info-circle"></em></a>
+                            <a asp-controller="SysAssistance" asp-action="Faq" asp-route-controllerName="SysFaq" asp-route-actionName="Detail" title="@SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Faq.ToInt())" class="mr-2" style="color:#036b7c"><em class="fa fa-question-circle"></em></a>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>

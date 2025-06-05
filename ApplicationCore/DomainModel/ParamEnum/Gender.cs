@@ -1,0 +1,1 @@
+ namespace ApplicationCore.DomainModel;  public enum Gender {     Female = 1,     Male = 2, }

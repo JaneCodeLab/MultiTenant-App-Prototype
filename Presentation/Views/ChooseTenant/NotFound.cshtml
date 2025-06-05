@@ -1,0 +1,44 @@
+﻿@{
+    var langEnum = User.GetLoggedInUserLanguageEnum();
+    ViewData["Title"] = SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Access_Denied.ToInt());
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@GeneralVariables.ApplicationName Login</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" href="~/dist/css/adminlte.min.css">
+    <style type="text/css">
+        ul {
+            list-style-type: none;
+        }
+
+    </style>
+</head>
+<body class="hold-transition lockscreen">
+    <div style="margin-top: 250px">
+        <section class="content-header text-center">
+            <section class="content">
+                <div class="error-content" style="text-align:center">
+                    <h1 class="headline text-warning" style="font-size:200px;">
+                        <em class="fa-solid fa-lock"></em>
+                    </h1>
+                    <h3>
+                        @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Access_Denied.ToInt())
+                    </h3>
+                    <p>
+                        @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.None_Tenant_Page_Description.ToInt())
+                    </p>
+                    <a class="text-lg" href="/ChooseTenant?returnUrl=/"><em class="fas fa-refresh"></em></a>
+                </div>
+            </section>
+        </section>
+    </div>
+</body>
+</html>

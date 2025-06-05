@@ -1,0 +1,39 @@
+﻿@model ErrorViewModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@GeneralVariables.ApplicationName Login</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" href="~/dist/css/adminlte.min.css">
+    <style type="text/css">
+        ul {
+            list-style-type: none;
+        }
+    </style>
+</head>
+<body class="hold-transition lockscreen">
+    <div style="margin-top: 250px">
+        <section class="content">
+            <div class="error-page">
+                <h2 class="headline text-danger">500</h2>
+
+                <div class="error-content">
+                    <h3><em class="fas fa-exclamation-triangle text-danger"></em> Oops! Something went wrong.</h3>
+                    <p>
+                        It looks like our server is having a bad day. We're on it!
+                        <br />
+                        Go Back  <a href="/Identity/Account/Login">Home</a>
+                    </p>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

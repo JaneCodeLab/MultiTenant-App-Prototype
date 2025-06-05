@@ -1,0 +1,1 @@
+ namespace ApplicationCore.DomainModel;  public enum ProgressStatus {     ToDo = 1,     InProgress = 2,     Done = 3,     Cancel = 5, }

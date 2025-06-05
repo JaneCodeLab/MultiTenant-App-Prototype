@@ -1,0 +1,47 @@
+﻿@model IEnumerable<SysReleaseNote>
+@{
+    ViewData["Title"] = SysExpressionHelper.Get(User.GetLoggedInUserLanguageEnum(), ExpressionTypes.SysReleaseNote, SysReleaseNoteExpression.VersionHistory.ToInt());
+    var langEnum = User.GetLoggedInUserLanguageEnum();
+}
+<style type="text/css">
+    li {
+        list-style-type: none;
+    }
+
+    .alert-secondary {
+        background-color: whitesmoke;
+        color: #404040;
+        border-color: #cfcfcf;
+    }
+
+    .text-warning-version {
+        color: #f97100 !important;
+    }
+</style>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                @foreach (var item in Model.OrderByDescending(c => c.ReleaseDate))
+                {
+                    <div class="alert alert-secondary">
+                        <strong class="badge @(item.IsComing ? "badge-warning" : "badge-info")" style="font-size:16px;">
+                            V @item.ReleaseNo
+                            <em class="fas fa-calendar-days ml-4"></em>
+                            @item.ReleaseDate.ToShortDateString()
+                            @if (item.IsComing)
+                            {
+                                <span style="font-style:italic">(Upcoming Release)</span>
+                            }
+
+                        </strong>
+                        @Html.Raw(item.Note)
+
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+</section>

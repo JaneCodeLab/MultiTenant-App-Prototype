@@ -1,0 +1,33 @@
+﻿@{
+    ViewData["Title"] = SysExpressionHelper.Get(ViewBag.langEnum, ExpressionTypes.General, GeneralExpression.Help.ToInt());
+    ViewData["Icon"] = "fa-info-circle";
+    ViewData["Path"] = new List<PathNavigator> { new PathNavigator { Title = ViewBag.controllerName, Address = $"/{ViewBag.controllerName}" }, };
+}
+
+<section class="content pt-3">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-info">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <em class="fa-solid fa-info-circle"></em>
+                            @SysExpressionHelper.Get(ViewBag.langEnum, ExpressionTypes.General, GeneralExpression.Help.ToInt())
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        @Html.Raw(ViewBag.help)
+                    </div>
+                    <div class="card-footer">
+                        <div class="float-right">
+                            <a class="btn btn-outline-info btn-footer" href="@ViewBag.returnUrl">
+                                <em class="fa fa-times mr-2"></em>
+                                @SysExpressionHelper.Get(ViewBag.langEnum, ExpressionTypes.General, GeneralExpression.Return.ToInt())
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

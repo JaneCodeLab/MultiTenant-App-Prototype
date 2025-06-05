@@ -1,0 +1,30 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@GeneralVariables.ApplicationName - @ViewData["Title"]</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" href="~/dist/css/adminlte.min.css">
+    <style type="text/css">
+        ul {
+            list-style-type: none;
+        }
+    </style>
+</head>
+<body class="hold-transition lockscreen">
+    <div style="margin-top: 250px">
+        <div class="text-center mb-5">
+            <a href="/Home">
+                <img alt="logo" src="~/img/logo.png" />
+            </a>
+        </div>
+        @RenderBody()
+    </div>
+    <script src="~/plugins/jquery/jquery.min.js"></script>
+    <script src="~/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/dist/js/adminlte.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

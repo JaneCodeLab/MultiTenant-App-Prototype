@@ -1,0 +1,68 @@
+﻿@page
+@model LoginWith2faModel
+@using Presentation;
+@using Infrastructure.Helpers;
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" href="~/dist/css/adminlte.min.css">
+    <style type="text/css">
+        ul {
+            list-style-type: none;
+        }
+    </style>
+</head>
+<body class="hold-transition lockscreen">
+    <div class="lockscreen-wrapper">
+        <div class="lockscreen-logo mb-5">
+            <a href="~/">
+                <img src="~/img/logo.png" alt="@GeneralVariables.ApplicationName" class="" style="opacity: .8">
+            </a>
+        </div>
+        <div class="lockscreen-name">@Model.FullName</div>
+        <div class="lockscreen-item">
+            <div class="lockscreen-image">
+                <img src='@(!Model.ProfileImage.Contains("data:image/png;") ? " /img/user/general/"+Model.ProfileImage : Model.ProfileImage)'
+                     alt="User Image">
+            </div>
+            <form class="lockscreen-credentials" method="post" asp-route-returnUrl="@Model.ReturnUrl">
+                <div class="input-group">
+                    <input asp-for="Input.TwoFactorCode" class="form-control" placeholder="@SysExpressionHelper.Get(Model.UserLanguage,ExpressionTypes.SysCustomUser,SysCustomUserExpression.CustomUser_AuthenticatorCode.ToInt())" autocomplete="off" />
+
+                    <div class="input-group-append">
+                        <button type="submit" class="btn">
+                            <em class="fas fa-arrow-right text-muted"></em>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="text-center">
+            <span asp-validation-for="Input.TwoFactorCode" class="text-danger"></span>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        </div>
+        <div class="help-block text-center">
+            @SysExpressionHelper.Get(Model.UserLanguage, ExpressionTypes.SysCustomUser, SysCustomUserExpression.CustomUser_2FGeneralMessage.ToInt())
+        </div>
+        <div class="text-center">
+            @SysExpressionHelper.Get(Model.UserLanguage, ExpressionTypes.General, GeneralExpression.Or.ToInt())
+            <a href="~/">
+                @SysExpressionHelper.Get(Model.UserLanguage, ExpressionTypes.SysCustomUser, SysCustomUserExpression.CustomUser_SigninDifferentUser.ToInt())
+            </a>
+        </div>
+        <div class="lockscreen-footer text-center">
+        </div>
+    </div>
+    <script src="~/plugins/jquery/jquery.min.js"></script>
+    <script src="~/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

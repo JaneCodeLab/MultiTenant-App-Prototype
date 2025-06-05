@@ -1,0 +1,19 @@
+﻿@{
+    var langEnum = User.GetLoggedInUserLanguageEnum();
+    ViewData["Title"] = SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Message.ToInt());
+    ViewData["CurrentMenu"] = ViewBag.MenuTitle;
+}
+
+<section class="content-header text-center mt-2">
+    <section class="content">
+        <div class="error-content" style="text-align:center">
+            <h3>
+                @ViewBag.message
+            </h3>
+            @if (!string.IsNullOrEmpty(ViewBag.ReturnUrl))
+            {
+                <a class="text-lg" href="@ViewBag.ReturnUrl"><em class="fas fa-refresh"></em></a>
+            }
+        </div>
+    </section>
+</section>

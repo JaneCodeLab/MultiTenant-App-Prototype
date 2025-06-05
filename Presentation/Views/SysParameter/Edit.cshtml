@@ -1,0 +1,88 @@
+﻿@model DtoSysParameter
+@{
+    var langEnum = User.GetLoggedInUserLanguageEnum();
+    ViewData["Title"] = SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Language_Edit.ToInt());
+    ViewData["Icon"] = "fa-solid fa-user-gear";
+    ViewData["CurrentMenu"] = SysExpressionHelper.Get(langEnum, ExpressionTypes.SysMenu, SysMenuExpression.Parameters.ToInt());
+    ViewData["Path"] = new List<PathNavigator>{
+     new PathNavigator { Title="LanguageSettings" , Address=$"/{ViewContext.GetControllerName()}"},
+    };
+}
+
+<section class="content pt-3">
+    <div class="container-fluid">
+        <form asp-action="Edit" class="needs-validation" novalidate>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card card-info">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <em class="fa-solid fa-user-gear"></em>
+                                @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Language_Edit.ToInt())
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <input type="hidden" asp-for="Id" />
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p>
+                                        <strong class="title">
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.AppKeyword.ToInt())
+                                        </strong>
+                                        :
+                                        <strong class="value">
+                                            @Html.DisplayFor(model => model.ParameterType)
+                                            @SysParameterHelper.FindPureName(Model.ParameterType, Model.ParameterItem)
+                                        </strong>
+                                    </p>
+                                    <p>
+                                        <strong class="title">
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Language.ToInt())
+                                        </strong>
+                                        :
+                                        <strong class="value">
+                                            <img alt="flags" src="~/img/flags/@((int)Model.Language).png" style="height:20px;margin-top:-2px;margin-right:5px;" />
+                                            @Html.DisplayFor(model => model.Language)
+                                        </strong>
+                                    </p>
+                                </div>
+                            </div>
+                            <hr />
+                            <div class="row">
+                                <div class="form-group col-md-12">
+                                    <div class="input-group mt-3">
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="Equivalent">
+                                                Equivalent
+                                            </label>
+                                        </div>
+                                        <input asp-for="Equivalent" class="form-control" required autocomplete="off" />
+                                        <div class="invalid-feedback text-size-10">
+                                            Please provide Value.
+                                        </div>
+                                    </div>
+                                    <span asp-validation-for="Equivalent" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer ">
+                            <div class="float-right">
+                                <a class="btn btn-outline-info btn-footer" asp-action="Index">
+                                    <em class="fa fa-times mr-2"></em>
+                                    @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Cancel.ToInt())
+                                </a>
+                                <button type="submit" class="btn btn-info btn-footer">
+                                    <em class="fa fa-check mr-2"></em>
+                                    @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Save.ToInt())
+                                </button>
+                            </div>
+                            <a asp-controller="SysAssistance" asp-action="Help" asp-route-controllerName="LanguageReport" asp-route-actionName="Index" title="@SysExpressionHelper.Get(langEnum,ExpressionTypes.General, GeneralExpression.Help.ToInt())" class="mr-2" style="color:#036b7c"><em class="fa fa-info-circle"></em></a>
+                            <a asp-controller="SysAssistance" asp-action="Faq" asp-route-controllerName="LanguageReport" asp-route-actionName="Index" title="@SysExpressionHelper.Get(langEnum,ExpressionTypes.General, GeneralExpression.Faq.ToInt())" class="mr-2" style="color:#036b7c"><em class="fa fa-question-circle"></em></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>

@@ -1,0 +1,123 @@
+﻿@model CustomUserEditModel
+@{
+    var langEnum = User.GetLoggedInUserLanguageEnum();
+    ViewData["Title"] = SysExpressionHelper.Get(langEnum, ExpressionTypes.SysCustomUser, SysCustomUserExpression.CustomUser_Edit.ToInt());
+    ViewData["Icon"] = "fas fa-user-secret";
+    ViewData["Path"] = new List<PathNavigator> { new PathNavigator { Title = SysExpressionHelper.Get(langEnum, ExpressionTypes.SysCustomUser, SysCustomUserExpression.CustomUsers.ToInt()), Address = $"/{ViewContext.GetControllerName()}" }, };
+}
+
+<section class="content pt-3">
+    <div class="container-fluid">
+        <form asp-action="Edit" class="needs-validation" novalidate>
+            <input type="hidden" asp-for="Id" />
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card card-info">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <em class="fa fa-users"></em>
+                                @SysExpressionHelper.Get(langEnum, ExpressionTypes.SysCustomUser, SysCustomUserExpression.CustomUser_Edit.ToInt())
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <input type="hidden" asp-for="Id" />
+                            <div class="row">
+                                <div class="form-group col-md-6">
+                                    <div class="input-group has-validation mt-3">
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="FirstName">
+                                                @SysExpressionHelper.Get(langEnum, ExpressionTypes.SysCustomUser, SysCustomUserExpression.CustomUser_FirstName.ToInt())
+                                            </label>
+                                        </div>
+                                        <input asp-for="FirstName" class="form-control" required autocomplete="off" />
+                                        <div class="invalid-feedback text-size-10">
+                                            Please provide FirstName.
+                                        </div>
+                                    </div>
+                                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <div class="input-group mt-3">
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="LastName">
+                                                @SysExpressionHelper.Get(langEnum, ExpressionTypes.SysCustomUser, SysCustomUserExpression.CustomUser_LastName.ToInt())
+                                            </label>
+                                        </div>
+                                        <input asp-for="LastName" class="form-control" required autocomplete="off" />
+                                        <div class="invalid-feedback text-size-10">
+                                            Please provide LastName.
+                                        </div>
+                                    </div>
+                                    <span asp-validation-for="LastName" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-md-6">
+                                    <div class="input-group has-validation mt-3">
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="Email">
+                                                @SysExpressionHelper.Get(langEnum, ExpressionTypes.SysCustomUser, SysCustomUserExpression.CustomUser_Email.ToInt())
+                                            </label>
+                                        </div>
+                                        <input asp-for="Email" type="email" class="form-control" required autocomplete="off" />
+                                        <div class="invalid-feedback text-size-10">
+                                            Please provide Email.
+                                        </div>
+                                    </div>
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <div class="input-group has-validation mt-3">
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="PhoneNumber">
+                                                @SysExpressionHelper.Get(langEnum, ExpressionTypes.SysCustomUser, SysCustomUserExpression.CustomUser_PhoneNumber.ToInt())
+                                            </label>
+                                        </div>
+                                        <input asp-for="PhoneNumber" class="form-control" required autocomplete="off" />
+                                        <div class="invalid-feedback text-size-10">
+                                            Please provide PhoneNumber.
+                                        </div>
+                                    </div>
+                                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-md-6">
+                                    <div class="input-group has-validation mt-3">
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="Language">
+                                                @SysExpressionHelper.Get(langEnum, ExpressionTypes.SysCustomUser, SysCustomUserExpression.CustomUser_Language.ToInt())
+                                            </label>
+                                        </div>
+                                        <select asp-for="Language" asp-items="@Html.GetEnumSelectList(typeof(Language))" class="form-control">
+                                        </select>
+                                        <div class="invalid-feedback text-size-10">
+                                            Please provide Language.
+                                        </div>
+                                    </div>
+                                    <span asp-validation-for="Language" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer ">
+                            <div class="float-right">
+                                <a class="btn btn-outline-info btn-footer" asp-action="Index">
+                                    <em class="fa fa-times mr-2"></em>
+                                    @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Cancel.ToInt())
+                                </a>
+                                <button type="submit" class="btn btn-info btn-footer">
+                                    <em class="fa fa-check mr-2"></em>
+                                    @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Save.ToInt())
+                                </button>
+                            </div>
+                            <a asp-controller="SysAssistance" asp-action="Help" asp-route-controllerName="UserManagement" asp-route-actionName="Edit" title="@SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Help.ToInt())" class="mr-2" style="color:#036b7c"><em class="fa fa-info-circle"></em></a>
+                            <a asp-controller="SysAssistance" asp-action="Faq" asp-route-controllerName="UserManagement" asp-route-actionName="Edit" title="@SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Faq.ToInt())" class="mr-2" style="color:#036b7c"><em class="fa fa-question-circle"></em></a>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>

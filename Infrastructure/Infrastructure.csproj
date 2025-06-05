@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Helpers\Enums\**" />
+    <Compile Remove="Helpers\Models\Messages\**" />
+    <EmbeddedResource Remove="Helpers\Enums\**" />
+    <EmbeddedResource Remove="Helpers\Models\Messages\**" />
+    <None Remove="Helpers\Enums\**" />
+    <None Remove="Helpers\Models\Messages\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Helpers\ClaimsPrincipalExtensions.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="7.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.8" />
+    <PackageReference Include="Minio" Version="5.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ApplicationCore\ApplicationCore.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Migrations\ApplicationDb\" />
+    <Folder Include="Migrations\TenantDb\" />
+  </ItemGroup>
+
+</Project>

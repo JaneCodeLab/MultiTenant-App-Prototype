@@ -1,0 +1,42 @@
+﻿@model List<VmMenuItem>
+
+@foreach (var parentMenu in Model.OrderBy(c => c.Order))
+{
+    <li class="nav-item @(parentMenu.Selected ? "menu-open" : "")">
+        <a asp-controller="@parentMenu.Controller" asp-action="@parentMenu.Action" class="nav-link @(parentMenu.Selected ? "active" : "")">
+            <em class="nav-icon @parentMenu.Icon"></em>
+            <p>
+                @parentMenu.Title
+                @if (!string.IsNullOrEmpty(parentMenu.Badge))
+                {
+                    <span class="badge @parentMenu.BadgeClass right">@parentMenu.Badge</span>
+                }
+                else if (parentMenu.Children.Count > 0)
+                {
+                    if(parentMenu.Selected)
+                    {
+                        <em class="fas fa-angle-down right"></em>
+                    }
+                    else
+                    {
+                        <em class="fas fa-angle-right right"></em>
+                    }
+                }
+            </p>
+        </a>
+        @if (parentMenu.Children.Count > 0)
+        {
+            <ul class="nav nav-treeview">
+                @foreach (var childMenu in parentMenu.Children.OrderBy(c => c.Order))
+                {
+                    <li class="nav-item">
+                        <a asp-controller="@childMenu.Controller" asp-action="@childMenu.Action" class="nav-link @(childMenu.Selected ? "active" : "")">
+                            <em class="@childMenu.Icon nav-icon text-white"></em>
+                            <p>@childMenu.Title</p>
+                        </a>
+                    </li>
+                }
+            </ul>
+        }
+    </li>
+}

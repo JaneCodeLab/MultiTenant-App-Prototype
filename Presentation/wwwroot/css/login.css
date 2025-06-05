@@ -1,0 +1,61 @@
+ul {
+    list-style-type: none;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-background-clip: #fff;
+    -webkit-text-fill-color: #000;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+.input-group-text {
+    background-color: #53517a;
+    color: white;
+}
+
+.login-page .icheck-primary > input:first-child:checked + input[type=hidden] + label::before, .icheck-primary > input:first-child:checked + label::before {
+    background-color: #53517a;
+    border-color: #343a40;
+}
+
+.validation-summary-errors > ul {
+    padding: 0;
+    color: #53517a;
+}
+
+    .validation-summary-errors > ul::before {
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        content: "\f071";
+    }
+
+.btn {
+    background-color: #53517a;
+    border-color: #343a40;
+}
+
+.login-page {
+    justify-content: normal;
+}
+
+.pageContent {
+    margin-top: 100px;
+}
+body {
+    background-image: url('/img/login-background.jpg');
+    background-position: top;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+@media (max-width: 480px) {
+    body {
+        background-image: none;
+        background-position: top;
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+}

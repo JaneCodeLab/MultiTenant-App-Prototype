@@ -1,0 +1,23 @@
+﻿@page
+@model AccessDeniedModel
+@{
+    var langEnum = User.GetLoggedInUserLanguageEnum();
+    ViewData["Title"] = SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Access_Denied.ToInt());
+    Layout = "_AdminLayout";
+    ViewData["Path"] = new List<PathNavigator>{};
+}
+<section class="content-header text-center mt-5">
+    <section class="content">
+        <div class="error-content" style="text-align:center">
+            <h1 class="headline text-warning" style="font-size:200px;">
+                <em class="fa-solid fa-lock"></em>
+            </h1>
+            <h3>
+                @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Access_Denied.ToInt())
+            </h3>
+            <p>
+                @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Access_Denied_Page_Description.ToInt())
+            </p>
+        </div>
+    </section>
+</section>

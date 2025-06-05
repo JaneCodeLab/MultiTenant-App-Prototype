@@ -1,0 +1,288 @@
+﻿@model IEnumerable<DepartmentMember>
+@{
+    var langEnum = User.GetLoggedInUserLanguageEnum();
+    ViewData["Title"] = SysExpressionHelper.Get(langEnum, ExpressionTypes.DepartmentMember, DepartmentMemberExpression.DepartmentMembers.ToInt());
+    ViewData["Icon"] = "fas fa-user-secret";
+    ViewData["CurrentMenu"] = SysExpressionHelper.Get(langEnum, ExpressionTypes.SysMenu, SysMenuExpression.Members.ToInt());
+
+    var locked_lable = SysExpressionHelper.Get(langEnum, ExpressionTypes.BaseEntity, BaseEntityExpression.Locked.ToInt());
+    var Change_Status_lable = SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Change_Status.ToInt());
+    var Inactive_lable = SysExpressionHelper.Get(langEnum, ExpressionTypes.BaseEntity, BaseEntityExpression.Inactive.ToInt());
+    var Edit_lable = SysExpressionHelper.Get(langEnum, ExpressionTypes.DepartmentMember, DepartmentMemberExpression.Edit.ToInt());
+    var Delete_lable = SysExpressionHelper.Get(langEnum, ExpressionTypes.DepartmentMember, DepartmentMemberExpression.Delete.ToInt());
+    var User_TimeZone = User.GetLoggedInUserTimezoneId();
+    var OnlineUserId = User.GetLoggedInUserId();
+    var Members = ViewBag.Members;
+}
+
+<section class="content pt-3">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12" id="treeView" style="@(Model.Count() == 0 ? "display:none;":"")">
+                <div class="card">
+                    <div class="card-header text-white bg-dark-info">
+                        <span class="btn btn-light btn-sm" onclick="changeView(true)" style="float:right">
+                            <span class="fas fa-th"></span>
+                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.ShowGridView.ToInt())
+                        </span>
+                        <h3 class="card-title">
+                            <em class="fas fa-certificate nav-icon"></em>
+                            @(ViewBag.DepartmentName)'s Members
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="orgChartContainer" style="width:100%; overflow-x:scroll">
+                            <div id="orgChart"></div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        @if (!Model.Any())
+                        {
+                            <div class="float-right">
+                                <a onclick="event.preventDefault();openModal('0','')" href="">
+                                    <em class="fa fa-plus mr-1"></em>
+                                    @SysExpressionHelper.Get(langEnum, ExpressionTypes.DepartmentMember, DepartmentMemberExpression.AddMember.ToInt())
+                                </a>
+                            </div>
+                        }
+                        <a asp-controller="SysAssistance" asp-action="Help" asp-route-controllerName="DepartmentMember" asp-route-actionName="Index" title="@SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Help.ToInt())" class="mr-2" style="color:#036b7c"><em class="fa fa-info-circle"></em></a>
+                        <a asp-controller="SysAssistance" asp-action="Faq" asp-route-controllerName="DepartmentMember" asp-route-actionName="Index" title="@SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Faq.ToInt())" class="mr-2" style="color:#036b7c"><em class="fa fa-question-circle"></em></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12" id="gridView" style="@(Model.Count() > 0 ? "display:none;":"")">
+                <div class="card">
+                    <div class="card-header text-white bg-dark-info">
+                        <span class="btn btn-light btn-sm" onclick="changeView(false)" style="float:right">
+                            <span class="fas fa-sitemap"></span>
+                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.ShowTreeView.ToInt())
+                        </span>
+                        <h3 class="card-title">
+                            <em class="fas fa-certificate nav-icon"></em>
+                            @(ViewBag.DepartmentName)'s Members
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <table id="CustomDataTable" summary="forDepartmentMember" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th id="FirstColumn" class="no-sort no-vis state-column">
+                                    </th>
+                                    <th id="MemberFullNameColumn" class="colvis">
+                                        @SysExpressionHelper.Get(langEnum, ExpressionTypes.DepartmentMember, DepartmentMemberExpression.MemberFullName.ToInt())
+                                    </th>
+                                    <th id="SupervisorMemberFullName">
+                                        @SysExpressionHelper.Get(langEnum, ExpressionTypes.DepartmentMember, DepartmentMemberExpression.SupervisorMemberFullName.ToInt())
+                                    </th>
+                                    <th id="DepartmentRoleTitle">
+                                        @SysExpressionHelper.Get(langEnum, ExpressionTypes.DepartmentMember, DepartmentMemberExpression.DepartmentRoleId.ToInt())
+                                    </th>
+                                    <th id="CreatedAtColumn">
+                                        @SysExpressionHelper.Get(langEnum, ExpressionTypes.BaseEntity, BaseEntityExpression.CreatedAt.ToInt())
+                                    </th>
+                                    <th id="CreatedByColumn">
+                                        @SysExpressionHelper.Get(langEnum, ExpressionTypes.BaseEntity, BaseEntityExpression.CreatedBy.ToInt())
+                                    </th>
+                                    <th id="UpdatedAtColumn">
+                                        @SysExpressionHelper.Get(langEnum, ExpressionTypes.BaseEntity, BaseEntityExpression.UpdatedAt.ToInt())
+                                    </th>
+                                    <th id="UpdatedByColumn">
+                                        @SysExpressionHelper.Get(langEnum, ExpressionTypes.BaseEntity, BaseEntityExpression.UpdatedBy.ToInt())
+                                    </th>
+                                    <th class="no-sort no-vis" style="width:80px;">
+                                        <a asp-action="Create" asp-route-departmentId="@ViewBag.DepartmentId" style="color:forestgreen"
+                                           title="@SysExpressionHelper.Get(langEnum, ExpressionTypes.DepartmentCustomer, DepartmentCustomerExpression.Create.ToInt())"
+                                           onclick="event.preventDefault();openModal('','','')">
+                                            <em class="fa-solid fa-square-plus"></em>
+                                            <span class="text-xs text-bold">
+                                                @SysExpressionHelper.Get(langEnum, ExpressionTypes.DepartmentCustomer, DepartmentCustomerExpression.Create.ToInt())
+                                            </span>
+                                        </a>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr style="@(!item.Active ? "background-color:#f8e3e1" : "")">
+                                        <td class="state-column">
+                                            @if (item.Locked)
+                                            {
+                                                <span class="fa fa-lock btn-custom-lock" title="@locked_lable"></span>
+                                            }
+                                            else
+                                            {
+                                                @if (item.Active)
+                                                {
+                                                    <a title="@Change_Status_lable" asp-action="ChangeState" asp-route-id="@item.Id" asp-route-activate="true" class="fas fa-toggle-on text-success"></a>
+                                                }
+                                                else
+                                                {
+                                                    <a title="@Change_Status_lable" asp-action="ChangeState" asp-route-id="@item.Id" asp-route-activate="false" class="fas fa-toggle-off btn-custom-Inactive"></a>
+                                                }
+                                            }
+                                        </td>
+                                        <td>
+                                            @item.FullName
+                                        </td>
+                                        <td>
+                                            @item.SupervisorMember?.FullName
+                                        </td>
+                                        <td>
+                                            @item.DepartmentRole?.Title
+                                        </td>
+                                        <td>
+                                            @item.CreatedAt.GetLocalDateTime(User_TimeZone)
+                                        </td>
+                                        <td>
+                                            @item.CreatedBy
+                                        </td>
+                                        <td>
+                                            @item.UpdatedAt.GetLocalDateTime(User_TimeZone)
+                                        </td>
+                                        <td>
+                                            @item.UpdatedBy
+                                        </td>
+                                        <td style="width:80px;text-align:center">
+                                            @if (item.Locked)
+                                            {
+                                                <span class="fa fa-lock btn-custom-lock" title="@locked_lable"></span>
+                                                @if (item.Owner == OnlineUserId)
+                                                {
+                                                    <a asp-action="ChangeLock" asp-route-id="@item.Id" asp-route-lockStatus="true" class="text-xs text-bold">
+                                                        @locked_lable
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-xs text-bold">
+                                                        @locked_lable
+                                                    </span>
+                                                }
+                                            }
+                                            else if (!item.Active)
+                                            {
+                                                <span class="fa-solid fa-eye-slash btn-custom-Inactive" title="@Inactive_lable"></span>
+                                                <span class="text-xs text-bold">
+                                                    @Inactive_lable
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <a title="@Edit_lable" class="mr-2" style="color:#036b7c" onclick="event.preventDefault();openModal('@item.Id','@item.UserId','@item.SupervisorMemberId','@item.DepartmentRoleId')"><span class="fa-solid fa-pencil"></span></a>
+                                                <a title="@Delete_lable" style="color:#b90a2b" onclick="event.preventDefault();deleteConfirm('@item.Id')"><em class="fa-solid fa-trash-can"></em></a>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer">
+                        @if (!Model.Any())
+                        {
+                            <div class="float-right">
+                                <a onclick="event.preventDefault();openModal('0','')" href="">
+                                    <em class="fa fa-plus mr-1"></em>
+                                    @SysExpressionHelper.Get(langEnum, ExpressionTypes.DepartmentMember, DepartmentMemberExpression.AddMember.ToInt())
+                                </a>
+                            </div>
+                        }
+                        <a asp-controller="SysAssistance" asp-action="Help" asp-route-controllerName="DepartmentMember" asp-route-actionName="Index" title="@SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Help.ToInt())" class="mr-2" style="color:#036b7c"><em class="fa fa-info-circle"></em></a>
+                        <a asp-controller="SysAssistance" asp-action="Faq" asp-route-controllerName="DepartmentMember" asp-route-actionName="Index" title="@SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Faq.ToInt())" class="mr-2" style="color:#036b7c"><em class="fa fa-question-circle"></em></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-dark-info text-white">
+                <h5 class="modal-title" id="modalTitle">
+                    @SysExpressionHelper.Get(langEnum, ExpressionTypes.DepartmentMember, DepartmentMemberExpression.Create.ToInt())
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form asp-action="Save" id="saveForm" class="needs-validation" novalidate>
+                <input name="Id" id="Id" type="hidden" class="form-control" required autocomplete="off" />
+                <input name="DepartmentId" id="DepartmentId" value="@ViewBag.DepartmentId" type="hidden" class="form-control" required autocomplete="off" />
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="row">
+                                <div class="form-group col-12">
+                                    <label class="control-label" for="UserId">
+                                        @SysExpressionHelper.Get(langEnum, ExpressionTypes.DepartmentMember, DepartmentMemberExpression.MemberFullName.ToInt())
+                                    </label>
+                                    <select name="UserId" id="UserId" asp-items="ViewBag.PersonnelList" required class="dark_blue_style_border select2 form-control">
+                                        <option selected="selected" value=""> @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Please_Select.ToInt())</option>
+                                    </select>
+                                    <div class="invalid-feedback text-size-10" for="UserId">
+                                        @SysExpressionHelper.Get(langEnum, ExpressionTypes.BaseEntity, BaseEntityExpression.Requiered_Validation_Message.ToInt() , (ExpressionParamConstants.Field, SysExpressionHelper.Get(langEnum,ExpressionTypes.DepartmentMember,DepartmentMemberExpression.MemberFullName.ToInt())))
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="row">
+                                <div class="form-group col-12">
+                                    <label class="control-label" for="SupervisorMemberId">
+                                        @SysExpressionHelper.Get(langEnum, ExpressionTypes.DepartmentMember, DepartmentMemberExpression.SupervisorMemberFullName.ToInt())
+                                    </label>
+                                    <select name="SupervisorMemberId" id="SupervisorMemberId" asp-items="ViewBag.MemberList" class="dark_blue_style_border select2 form-control">
+                                    </select>
+                                    <div class="invalid-feedback text-size-10" for="SupervisorMemberId">
+                                        @SysExpressionHelper.Get(langEnum, ExpressionTypes.BaseEntity, BaseEntityExpression.Requiered_Validation_Message.ToInt() , (ExpressionParamConstants.Field, SysExpressionHelper.Get(langEnum,ExpressionTypes.DepartmentMember,DepartmentMemberExpression.SupervisorMemberFullName.ToInt())))
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="row">
+                                <div class="form-group col-12">
+                                    <label class="control-label" for="DepartmentRoleId">
+                                        @SysExpressionHelper.Get(langEnum, ExpressionTypes.DepartmentMember, DepartmentMemberExpression.DepartmentRoleId.ToInt())
+                                    </label>
+                                    <select name="DepartmentRoleId" id="DepartmentRoleId" asp-items="ViewBag.DepartmentRoleList" required class="dark_blue_style_border select2 form-control">
+                                    </select>
+                                    <div class="invalid-feedback text-size-10" for="DepartmentRoleId">
+                                        @SysExpressionHelper.Get(langEnum, ExpressionTypes.BaseEntity, BaseEntityExpression.Requiered_Validation_Message.ToInt() , (ExpressionParamConstants.Field, SysExpressionHelper.Get(langEnum,ExpressionTypes.DepartmentMember,DepartmentMemberExpression.DepartmentRoleId.ToInt())))
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="searchButton" type="submit" class="btn btn-info btn-footer float-right">
+                        <em class="fas fa-plus mr-2"></em>
+                        @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Save.ToInt())
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <link asp-append-version="true" href="~/lib/treechart/jquery.orgchart.css" rel="stylesheet" />
+    <script asp-append-version="true" src="~/lib/treechart/jquery.orgchart.js"></script>
+    <script asp-append-version="true" src="~/js/pages/department_member.js"></script>
+    <script>
+        var no_records = @Model.Count();
+        var treeData = [@Html.Raw(Members)];
+        var createTitle = '@SysExpressionHelper.Get(langEnum, ExpressionTypes.DepartmentCustomer, DepartmentExpression.Create.ToInt())';
+        var editTitle = '@SysExpressionHelper.Get(langEnum, ExpressionTypes.DepartmentCustomer, DepartmentExpression.Edit.ToInt())';
+        var deleteMboxTitle = '@SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Delete.ToInt())';
+        var sureToDelete = '@SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Sure_To_Delete.ToInt())';
+        var yesDeleteButton = '@SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Yes_I_Am_Sure_To_Delete_It.ToInt())';
+        var noButton = '@SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.No.ToInt())';
+    </script>
+}

@@ -1,0 +1,222 @@
+﻿@model ViewListModel<SysApiLog,ApiLogFilter>
+@{
+    var langEnum = User.GetLoggedInUserLanguageEnum();
+    ViewData["Title"] = SysExpressionHelper.Get(langEnum, ExpressionTypes.SysApiLog, SysApiLogExpression.ApiLogs.ToInt());
+    ViewData["Icon"] = "fas fa-user-secret";
+    ViewData["Filter"] = Model.Filter;
+    ViewData["CurrentMenu"] = SysExpressionHelper.Get(langEnum, ExpressionTypes.SysMenu, SysMenuExpression.ApiLogs.ToInt());
+
+    var Inactive_lable = SysExpressionHelper.Get(langEnum, ExpressionTypes.BaseEntity, BaseEntityExpression.Inactive.ToInt());
+    var User_TimeZone = User.GetLoggedInUserTimezoneId();
+    var Detail_lable = SysExpressionHelper.Get(langEnum, ExpressionTypes.SysApiLog, SysApiLogExpression.ApiLog_Detail.ToInt());
+    var selectedType = Model.Filter.ApiRequestTypeParamId == null ? string.Empty : ((SelectList)ViewBag.ApiRequestTypeList).FirstOrDefault(c => c.Value == Model.Filter.ApiRequestTypeParamId.ToString()).Text;
+
+}
+<section class="content pt-3">
+    <div class="container-fluid">
+        <div id="accordion">
+            <div class="card @(Model.Filter.IsNullOrEmpty() ? "card-secondary" : "card-info")">
+                <div class="card-header">
+                    <h4 class="card-title w-100">
+                        <span class="d-block w-100 collapsed" data-toggle="collapse" href="#collapseOne" aria-expanded="false">
+                            <em class="fas fa-search mr-1"></em>
+                            <span class="mr-2">
+                                @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Advanced_Search.ToInt())
+                            </span>
+                            <span style="float:right">
+                                @foreach (var item in @Model.Filter.GetFields())
+                                {
+                                    if (item.GetValue(Model.Filter) != null)
+                                    {
+                                        if (item.PropertyType == typeof(bool) || item.PropertyType == typeof(Nullable<bool>))
+                                        {
+                                            <a onclick="clean_filter(event,'@item.Name')" class="badge badge-light text-xs text-dark text-bold">
+                                                @item.GetLable(langEnum,ExpressionTypes.BaseEntity,ExpressionTypes.SysApiLog)
+                                                :
+                                                @((item.GetValue(Model.Filter) as bool?) == true ? SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Yes.ToInt()) : SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.No.ToInt()))
+                                                <span class="text-danger ml-2"><em class="fa fa-times"></em></span>
+                                            </a>
+                                        }
+                                        else if (item.PropertyType == typeof(DateTime) || item.PropertyType == typeof(Nullable<DateTime>))
+                                        {
+                                            if (item.Name == nameof(Model.Filter.CreatedAtStart))
+                                            {
+                                                <span class="badge badge-light text-xs text-dark text-bold">
+                                                    @item.GetLable(langEnum,ExpressionTypes.BaseEntity,ExpressionTypes.SysApiLog)
+                                                    :
+                                                    @((item.GetValue(Model.Filter) as DateTime?).Value.ToShortDateString())
+                                                    <span class="ml-2"><em class="fas fa-lock"></em></span>
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <a onclick="clean_filter(event,'@item.Name')" class="badge badge-light text-xs text-dark text-bold">
+                                                    @item.GetLable(langEnum,ExpressionTypes.BaseEntity,ExpressionTypes.SysApiLog)
+                                                    :
+                                                    @((item.GetValue(Model.Filter) as DateTime?).Value.ToShortDateString())
+                                                    <span class="text-danger ml-2"><em class="fa fa-times"></em></span>
+                                                </a>
+                                            }
+                                        }
+                                        else if (item.PropertyType == typeof(int) || item.PropertyType == typeof(int?))
+                                        {
+                                            <span class="badge badge-light text-xs text-dark text-bold">
+                                                @item.GetLable(langEnum,ExpressionTypes.BaseEntity,ExpressionTypes.SysApiLog): @selectedType
+                                                <span class="ml-2"><em class="fas fa-lock"></em></span>
+                                            </span>
+                                        }
+                                    }
+                                }
+                            </span>
+                        </span>
+                    </h4>
+                </div>
+                <form asp-action="Index">
+                    <input type="hidden" asp-for="Filter.ClearAll" />
+                    <input type="hidden" asp-for="Filter.ItemRemoved" />
+                    <div id="collapseOne" class="collapse" data-parent="#accordion" style="">
+                        <div class="card-body" style="background-color:@(Model.Filter.IsNullOrEmpty() ? "#ffffff" : "#dcf1f4")">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label class="control-label" for="Filter_ApiRequestTypeParamId">
+                                                    @SysExpressionHelper.Get(langEnum,ExpressionTypes.SysApiLog,SysApiLogExpression.ApiRequestTypeParamId.ToInt())
+                                                </label>
+                                                <select asp-for="@Model.Filter.ApiRequestTypeParamId" asp-items="ViewBag.ApiRequestTypeList" class="form-control">
+                                                </select>
+                                            </div>
+                                        </div>
+                                        @foreach (var item in @Model.Filter.GetFields().OrderBy(o => o.PropertyType.FullName).ThenBy(o => o.Name))
+                                        {
+                                            if (item.PropertyType == typeof(bool) || item.PropertyType == typeof(Nullable<bool>))
+                                            {
+                                                if (item.Name == nameof(Model.Filter.Active))
+                                                    continue;
+                                                var value = (item.GetValue(Model.Filter) as bool?);
+                                                <div class="col-md-2">
+                                                    <div class="form-group">
+                                                        <label class="control-label" for="Filter_@item.Name">
+                                                            @item.GetLable(langEnum,ExpressionTypes.BaseEntity,ExpressionTypes.SysApiLog)
+                                                        </label>
+                                                        <select asp-for="@value" id="Filter_@item.Name" name="Filter.@item.Name" class="form-control">
+                                                            <option selected="selected" value="">
+                                                                @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Please_Select.ToInt())
+                                                            </option>
+                                                            <option value="true">
+                                                                @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Yes.ToInt())
+                                                            </option>
+                                                            <option value="false">
+                                                                @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.No.ToInt())
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            }
+                                            else if (item.PropertyType == typeof(DateTime) || item.PropertyType == typeof(Nullable<DateTime>))
+                                            {
+                                                var value = (item.GetValue(Model.Filter) as DateTime?);
+                                                <div class="col-md-2">
+                                                    <div class="form-group">
+                                                        <label class="control-label" for="Filter_@item.Name">
+                                                            @item.GetLable(langEnum,ExpressionTypes.BaseEntity,ExpressionTypes.SysApiLog)
+                                                        </label>
+                                                        <input asp-for="@value" id="Filter_@item.Name" name="Filter.@item.Name" class="form-control" type="date" />
+                                                    </div>
+                                                </div>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <hr />
+                            <button id="searchButton" type="submit" class="btn btn-info btn-footer float-right">
+                                <em class="fas fa-search mr-2"></em>
+                                @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Search.ToInt())
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-dark">
+                    <div class="card-body">
+                        @if (Model.Records.Any())
+                        {
+                            <table id="CustomDataTable" summary="forLog" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="colvis">
+                                            @SysExpressionHelper.Get(langEnum,ExpressionTypes.SysApiLog,SysApiLogExpression.RequestURL.ToInt())
+                                        </th>
+                                        <th scope="col">
+                                            @SysExpressionHelper.Get(langEnum,ExpressionTypes.SysApiLog,SysApiLogExpression.RequestDateTime.ToInt())
+                                        </th>
+                                        <th scope="col">
+                                            @SysExpressionHelper.Get(langEnum,ExpressionTypes.SysApiLog,SysApiLogExpression.ResponseDateTime.ToInt())
+                                        </th>
+                                        <th scope="col" class="colvis">
+                                            @SysExpressionHelper.Get(langEnum,ExpressionTypes.SysApiLog,SysApiLogExpression.RequestIP.ToInt())
+                                        </th>
+                                        <th scope="col">
+                                            @SysExpressionHelper.Get(langEnum,ExpressionTypes.SysApiLog,SysApiLogExpression.Duration.ToInt())
+                                        </th>
+                                        <th scope="col">
+                                            @SysExpressionHelper.Get(langEnum,ExpressionTypes.SysApiLog,SysApiLogExpression.ApiRequestStatusParamId.ToInt())
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.Records)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <a title="@Detail_lable" class="mr-2" style="color:#036b7c" asp-action="Detail" asp-route-id="@item.Id"><span class="fa-solid fa-eye"></span></a>
+                                                @item.RequestURL
+                                            </td>
+                                            <td>
+                                                @item.RequestDateTime.GetLocalDateTime(User_TimeZone)
+                                            </td>
+                                            <td>
+                                                @item.ResponseDateTime.GetLocalDateTime(User_TimeZone)
+                                            </td>
+                                            <td>
+                                                @item.RequestIP
+                                            </td>
+                                            <td>
+                                                @item.Duration ms
+                                            </td>
+                                            <td>
+                                                @SysParameterHelper.Get(langEnum,ParameterTypes.ApiRequestStatus,item.ApiRequestStatusParamId)
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                        else
+                        {
+                            <div class="text-center">
+                                <img alt="searching" src="~/img/searching.gif" />
+                                <p style="font-size:larger;font-weight:bolder;color: #abbcca;">
+                                    @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Sorry_No_Result_Found.ToInt())
+                                </p>
+                            </div>
+                        }
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" title="@SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Help.ToInt())">
+                            <em class="fa fa-info-circle"></em>
+                        </a>
+                        <a href="#" title="@SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Faq.ToInt())" class="ml-2">
+                            <em class="fa fa-question-circle"></em>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

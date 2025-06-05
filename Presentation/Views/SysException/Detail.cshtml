@@ -1,0 +1,149 @@
+﻿@model SysException
+@{
+    var langEnum = User.GetLoggedInUserLanguageEnum();
+    ViewData["Title"] = SysExpressionHelper.Get(langEnum, ExpressionTypes.SysLog, SysLogExpression.Detail.ToInt());
+    ViewData["Icon"] = "fas fa-user-secret";
+    ViewData["Path"] = new List<PathNavigator> { new PathNavigator { Title = SysExpressionHelper.Get(langEnum, ExpressionTypes.SysException, SysExceptionExpression.SysExceptions.ToInt()), Address = $"/{ViewContext.GetControllerName()}" }, };
+    ViewData["CurrentMenu"] = SysExpressionHelper.Get(langEnum, ExpressionTypes.SysMenu, SysMenuExpression.Bugs.ToInt());
+}
+
+<section class="content pt-3">
+    <div class="container-fluid">
+        <form asp-action="Delete">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card card-info">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <em class="fa fa-bug-slash"></em>
+                                @SysExpressionHelper.Get(langEnum, ExpressionTypes.SysException,SysExceptionExpression.SysException.ToInt())
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p>
+                                        <strong class="title">
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.BaseEntity, BaseEntityExpression.CreatedBy.ToInt())
+                                        </strong>
+                                        :
+                                        <strong class="value">
+                                            @Html.DisplayFor(model => model.CreatedBy) ( @Html.DisplayFor(model => model.CreatedAt) )
+                                        </strong>
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p>
+                                        <strong class="title">
+                                            @SysExpressionHelper.Get(langEnum,ExpressionTypes.SysCustomUser,SysCustomUserExpression.CustomUser_Language.ToInt())
+                                        </strong>
+                                        :
+                                        <strong class="value">
+                                            @Html.DisplayFor(model => model.Language)
+                                        </strong>
+                                    </p>
+                                </div>
+                            </div>
+                            <hr />
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p>
+                                        <strong class="title">
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SysException,SysExceptionExpression.SysException_Url.ToInt())
+                                        </strong>
+                                        :
+                                        <strong class="value">
+                                            @(Model.Scheme + "://" + Model.Host + Model.Path + Model.Parameters)
+                                            <span class="badge badge-success">
+                                                @Model.Method
+                                            </span>
+                                        </strong>
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p>
+                                        <strong class="title">
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SysException,SysExceptionExpression.SysException_ControllerName.ToInt())
+                                            (
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SysException,SysExceptionExpression.SysException_ActionName.ToInt())
+                                            )
+                                        </strong>
+                                        :
+                                        <strong class="value">
+                                            @Html.DisplayFor(model => model.ControllerName) ( @Html.DisplayFor(model => model.ActionName) )
+                                        </strong>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+
+                                    <p>
+                                        <strong class="title">
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SysException,SysExceptionExpression.SysException_Source.ToInt())
+                                        </strong>
+                                        :
+                                        <strong class="value">
+                                            @Html.DisplayFor(model => model.Source)
+                                        </strong>
+                                    </p>
+                                    <p>
+                                        <strong class="title">
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SysException,SysExceptionExpression.SysException_Message.ToInt())
+                                            (
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SysException,SysExceptionExpression.SysException_Type.ToInt())
+                                            )
+                                        </strong>
+                                        :
+                                        <strong class="value">
+                                            @Html.DisplayFor(model => model.Message) ( @Html.DisplayFor(model => model.Type) )
+                                        </strong>
+                                    </p>
+                                    @if (!string.IsNullOrEmpty(Model.InnerExceptionMessage))
+                                    {
+                                        <p>
+                                            <strong class="title">
+                                                @SysExpressionHelper.Get(langEnum, ExpressionTypes.SysException,SysExceptionExpression.SysException_InnerExceptionMessage.ToInt())
+                                                (
+                                                @SysExpressionHelper.Get(langEnum, ExpressionTypes.SysException,SysExceptionExpression.SysException_InnerExceptionType.ToInt())
+                                                )
+                                            </strong>
+                                            :
+                                            <strong class="value">
+                                                @Html.DisplayFor(model => model.InnerExceptionMessage) ( @Html.DisplayFor(model => model.InnerExceptionType) )
+                                            </strong>
+                                        </p>
+                                    }
+                                </div>
+                                <div class="col-md-6">
+                                </div>
+                            </div>
+                            <hr />
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <p>
+                                        <strong class="title">
+                                            StackTrace
+                                        </strong>
+                                    </p>
+                                    <textarea readonly disabled style="width:100%;min-height:300px;border:0">@Model.StackTrace</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <input type="hidden" asp-for="Id" />
+                            <div class="float-right">
+                                <a class="btn btn-outline-info btn-footer" asp-action="Index">
+                                    <em class="fa fa-times mr-2"></em>
+                                    @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Return_To_List.ToInt())
+                                </a>
+                            </div>
+                            <a asp-controller="SysAssistance" asp-action="Help" asp-route-controllerName="SysException" asp-route-actionName="Detail" title="@SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Help.ToInt())" class="mr-2" style="color:#036b7c"><em class="fa fa-info-circle"></em></a>
+                            <a asp-controller="SysAssistance" asp-action="Faq" asp-route-controllerName="SysException" asp-route-actionName="Detail" title="@SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Faq.ToInt())" class="mr-2" style="color:#036b7c"><em class="fa fa-question-circle"></em></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>

@@ -1,0 +1,88 @@
+﻿@model List<Tuple<string,string, IList<SysCustomUser>>>;
+@{
+    var langEnum = User.GetLoggedInUserLanguageEnum();
+    ViewData["Title"] = SysExpressionHelper.Get(langEnum, ExpressionTypes.SysMenu, SysMenuExpression.Roles.ToInt());
+    ViewData["Icon"] = "fa-solid fa-user-tag";
+    ViewData["CurrentMenu"] = SysExpressionHelper.Get(langEnum, ExpressionTypes.SysMenu, SysMenuExpression.Roles.ToInt());
+}
+
+<section class="content pt-3">
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-dark">
+                    <div class="card-body">
+                        <label class="control-label ">
+                            <em class="fa fa-info-circle"></em>
+                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SysCustomUser, SysCustomUserExpression.CustomUser_AddRoleToUser.ToInt())
+                        </label>
+                        <br />
+                        <table summary="forLanguages" id="MyCustomDataTable" class="table table-bordered table-striped">
+                            <thead class="text-lg">
+                                <tr>
+                                    @foreach (var role in Model)
+                                    {
+                                        <th style="width:20%" id="@(role)Column" class="bg-light no-sort">
+                                            @role.Item1
+                                        </th>
+                                    }
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    @foreach (var role in Model)
+                                    {
+                                        <td class="text-bold">
+                                            <div class="col-md-12">
+                                                <form asp-action="Assign">
+                                                    <input name="role" type="hidden" value="@role.Item1" />
+                                                    <div class="form-group">
+
+                                                        <select name="userIds[]" data-placeholder="@SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Please_Select.ToInt())" asp-items="@(ViewBag.UserList)" multiple="" class="form-control select2 select2-hidden-accessible" style="width: 100%;">
+                                                        </select>
+                                                        <button type="submit" class="btn btn-block btn-outline-success mt-1">
+                                                            <span class="fa-solid fa-plus"></span>
+                                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Add.ToInt())
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    }
+                                </tr>
+                                @for (int row = 0; row < Model.Max(m => m.Item3.Count); row++)
+                                {
+                                    <tr>
+                                        @for (int cell = 0; cell < Model.Count; cell++)
+                                        {
+                                            <td class="text-bold">
+                                                @if (Model[cell].Item3.Count > 0 && Model[cell].Item3.Count + 1 > row + 1)
+                                                {
+                                                    <b style="font-weight:bolder;color:crimson">
+                                                        @(Model[cell].Item3[row].FirstName + " " + Model[cell].Item3[row].LastName)
+                                                    </b>
+                                                    <a title="@SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Delete.ToInt())" class="fa-solid fa-trash float-right mt-2 mr-4 text-danger" asp-action="Remove" asp-route-role="@Model[cell].Item1" asp-route-userId="@Model[cell].Item3[row].Id"></a>
+                                                    <p>
+                                                        @(Model[cell].Item3[row].Email)
+                                                    </p>
+                                                }
+                                            </td>
+                                        }
+                                    </tr>
+                                }
+
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer">
+                        <a asp-controller="SysAssistance" asp-action="Help" asp-route-controllerName="LanguageReport" asp-route-actionName="Index" title="@SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Help.ToInt())" class="mr-2" style="color:#036b7c"><em class="fa fa-info-circle"></em></a>
+                        <a asp-controller="SysAssistance" asp-action="Faq" asp-route-controllerName="LanguageReport" asp-route-actionName="Index" title="@SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Faq.ToInt())" class="mr-2" style="color:#036b7c"><em class="fa fa-question-circle"></em></a>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

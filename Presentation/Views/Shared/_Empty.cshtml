@@ -1,0 +1,11 @@
+﻿@model string
+@{
+    var langEnum = User.GetLoggedInUserLanguageEnum();
+}
+
+<div id="@Model" class="text-center " style="display: none;">
+    <img alt="searching" src="~/img/searching.gif" />
+    <p style="font-size:larger;font-weight:bolder;color: #abbcca;">
+        @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Sorry_No_Result_Found.ToInt())
+    </p>
+</div>

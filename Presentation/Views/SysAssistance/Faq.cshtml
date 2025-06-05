@@ -1,0 +1,56 @@
+﻿@model List<SysFaq>
+@{
+    ViewData["Title"] = SysExpressionHelper.Get(ViewBag.langEnum, ExpressionTypes.General, GeneralExpression.Faq.ToInt());
+    ViewData["Icon"] = "fa-info-circle";
+    ViewData["Path"] = new List<PathNavigator> { new PathNavigator { Title = ViewBag.controllerName, Address = $"/{ViewBag.controllerName}" }, };
+    int index = 1;
+}
+<style type="text/css">
+    .faq-question {
+        color: crimson;
+        font-size: 16px;
+        font-weight: bolder;
+    }
+</style>
+
+<section class="content pt-3">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-info">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <em class="fa-solid fa-info-circle"></em>
+                            @ViewBag.pageTitle @SysExpressionHelper.Get(ViewBag.langEnum, ExpressionTypes.General, GeneralExpression.Faq.ToInt())
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        @foreach (var item in Model)
+                        {
+                            <div class="">
+                                <span class="direct-chat-infos clearfix faq-question">
+                                    @(index++).
+                                    @item.Question
+                                </span>
+                                <div class="direct-chat-text" style="margin:5px 0 0 20px;background-color: #eaf1ff;">
+                                    @Html.Raw(item.Answer.Replace("<p></p>", ""))
+                                </div>
+                            </div>
+
+                            <br />
+                        }
+                    </div>
+                    <div class="card-footer">
+                        <div class="float-right">
+                            <a class="btn btn-outline-info btn-footer" href="@ViewBag.returnUrl">
+                                <em class="fa fa-times mr-2"></em>
+                                @SysExpressionHelper.Get(ViewBag.langEnum, ExpressionTypes.General, GeneralExpression.Return.ToInt())
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+

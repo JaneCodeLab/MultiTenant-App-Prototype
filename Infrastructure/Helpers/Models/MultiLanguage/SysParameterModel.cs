@@ -1,0 +1,1 @@
+ using ApplicationCore.DomainModel;  namespace Infrastructure.Helpers {     public class SysParameterModel     {         public Language Language { get; set; }         public ParameterTypes ParameterType { get; set; }         public int ParameterItem { get; set; }         public string Equivalent { get; set; } = string.Empty;     } } 

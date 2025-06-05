@@ -1,0 +1,18 @@
+﻿@{
+    var langEnum = User.GetLoggedInUserLanguageEnum();
+    ViewData["Title"] = SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Access_Denied.ToInt());
+}
+
+<section class="content-header text-center mt-2">
+    <section class="content">
+        <img alt="AccessDenied" src="~/img/AccessDenied.png" />
+        <div class="error-content" style="text-align:center">
+            <h3>
+                @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Access_Denied.ToInt())
+            </h3>
+            <p>
+                @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Access_Denied_Page_Description.ToInt())
+            </p>
+        </div>
+    </section>
+</section>

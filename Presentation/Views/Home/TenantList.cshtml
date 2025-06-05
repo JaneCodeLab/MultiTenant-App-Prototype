@@ -1,0 +1,16 @@
+﻿@{
+    ViewData["Title"] = "TenantList";
+}
+<section class="content pt-3">
+    <div class="container-fluid">
+        <div class="text-center">
+            <img alt="marketgif" src="~/img/working/market.gif" style="height:270px;" />
+        </div>
+        <div class="row">
+            @foreach(var item in TenantHelper.Tenants)
+            {
+                <p>@item.Title : Ip= @item.DbIp</p>
+            }
+        </div>
+    </div>
+</section>

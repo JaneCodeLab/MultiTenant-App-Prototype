@@ -1,0 +1,22 @@
+﻿@{
+    var langEnum = User.GetLoggedInUserLanguageEnum();
+    ViewData["Title"] = SysExpressionHelper.Get(langEnum, ExpressionTypes.SysMenu, SysMenuExpression.ClearCaches.ToInt());
+    ViewData["CurrentMenu"] = SysExpressionHelper.Get(langEnum, ExpressionTypes.SysMenu, SysMenuExpression.ClearCaches.ToInt());
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card card-dark">
+            <div class="card-body">
+                <section class="content">
+                    <div class="container-fluid">
+                        <div class="p-4 text-lg text-green">
+                            <em class="fa fa-check"></em>
+                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.MessageBox_Clear_Cache_Successfully.ToInt())
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>

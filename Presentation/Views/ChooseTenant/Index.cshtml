@@ -1,0 +1,58 @@
+﻿@page
+@using Presentation;
+@using Infrastructure.Helpers;
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@GeneralVariables.ApplicationName Login</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" href="~/dist/css/adminlte.min.css">
+    <style type="text/css">
+        ul {
+            list-style-type: none;
+        }
+    </style>
+</head>
+<body class="hold-transition lockscreen">
+    <div class="lockscreen-wrapper">
+        <div class="lockscreen-logo mb-2">
+            <a href="~/">
+                <img src="~/img/logo.png" alt="@GeneralVariables.ApplicationName" class="" style="opacity: .8; height: 60px;">
+            </a>
+        </div>
+        <hr />
+        <p style="text-align:center">
+            <span class="fa fa-info-circle " style="color:#53517a"></span>
+            @SysExpressionHelper.Get(User.GetLoggedInUserLanguageEnum(), ExpressionTypes.General, GeneralExpression.SelectTenant.ToInt())
+        </p>
+        <div class="lockscreen-item">
+            <form method="post" asp-route-returnUrl="@ViewBag.ReturnUrl">
+                <div class="input-group">
+                    <select name="TenantId" class="form-control" placeholder="@SysExpressionHelper.Get(User.GetLoggedInUserLanguageEnum(),ExpressionTypes.SysCustomUser, SysCustomUserExpression.CustomUser_AuthenticatorCode.ToInt())" autocomplete="off">
+                        @foreach (var item in (List<SysTenantUser>)ViewBag.UsersTenants)
+                        {
+                            <option value="@item.TenantId">@item.Tenant.Title</option>
+                        }
+                    </select>
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-dark" style="background-color:#53517a">
+                            <em class="fas fa-arrow-right"></em>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="lockscreen-footer text-center">
+        </div>
+    </div>
+    <script src="~/plugins/jquery/jquery.min.js"></script>
+    <script src="~/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

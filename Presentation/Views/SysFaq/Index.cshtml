@@ -1,0 +1,250 @@
+﻿@model ViewListModel<SysFaq,BaseFilter>
+@{
+    var langEnum = User.GetLoggedInUserLanguageEnum();
+    ViewData["Title"] = SysExpressionHelper.Get(langEnum, ExpressionTypes.SysFaq, SysFaqExpression.SysFaqs.ToInt());
+    ViewData["Icon"] = "fas fa-user-secret";
+    ViewData["Filter"] = Model.Filter;
+    ViewData["CurrentMenu"] = SysExpressionHelper.Get(langEnum, ExpressionTypes.SysMenu, SysMenuExpression.Faq.ToInt());
+
+    var locked_lable = SysExpressionHelper.Get(langEnum, ExpressionTypes.BaseEntity, BaseEntityExpression.Locked.ToInt());
+    var Change_Status_lable = SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Change_Status.ToInt());
+    var Inactive_lable = SysExpressionHelper.Get(langEnum, ExpressionTypes.BaseEntity, BaseEntityExpression.Inactive.ToInt());
+    var Edit_lable = SysExpressionHelper.Get(langEnum, ExpressionTypes.SysFaq, SysFaqExpression.SysFaq_Edit.ToInt());
+    var Delete_lable = SysExpressionHelper.Get(langEnum, ExpressionTypes.SysFaq, SysFaqExpression.SysFaq_Delete.ToInt());
+    var Detail_lable = SysExpressionHelper.Get(langEnum, ExpressionTypes.SysFaq, SysFaqExpression.SysFaq_Detail.ToInt());
+    var User_TimeZone = User.GetLoggedInUserTimezoneId();
+}
+<section class="content pt-3">
+    <div class="container-fluid">
+        <div id="accordion">
+            <div class="card @(Model.Filter.IsNullOrEmpty() ? "card-secondary" : "card-info")">
+                <div class="card-header">
+                    <h4 class="card-title w-100">
+                        <span class="d-block w-100 collapsed" data-toggle="collapse" href="#collapseOne" aria-expanded="false">
+                            <em class="fas fa-search mr-1"></em>
+                            <span class="mr-2">
+                                @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Advanced_Search.ToInt())
+                            </span>
+                            <span style="float:right">
+                                @foreach (var item in @Model.Filter.GetFields())
+                                {
+                                    if (item.GetValue(Model.Filter) != null)
+                                    {
+                                        if (item.PropertyType == typeof(bool) || item.PropertyType == typeof(Nullable<bool>))
+                                        {
+                                            <a onclick="clean_filter(event,'@item.Name')" class="badge badge-light text-xs text-dark text-bold">
+                                                @item.GetLable(langEnum,ExpressionTypes.BaseEntity)
+                                                :
+                                                @((item.GetValue(Model.Filter) as bool?) == true ? SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Yes.ToInt()) : SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.No.ToInt()))
+                                                <span class="text-danger ml-2"><em class="fa fa-times"></em></span>
+                                            </a>
+                                        }
+                                        else if (item.PropertyType == typeof(DateTime) || item.PropertyType == typeof(Nullable<DateTime>))
+                                        {
+                                            <a onclick="clean_filter(event,'@item.Name')" class="badge badge-light text-xs text-dark text-bold">
+                                                @item.GetLable(langEnum,ExpressionTypes.BaseEntity)
+                                                :
+                                                @((item.GetValue(Model.Filter) as DateTime?).Value.ToShortDateString())
+                                                <span class="text-danger ml-2"><em class="fa fa-times"></em></span>
+                                            </a>
+                                        }
+                                    }
+                                }
+
+                                @if (!Model.Filter.IsNullOrEmpty())
+                                {
+                                    <a href="#" onclick="clear_all_filter()" title="@SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Clear_All_Filters.ToInt())" class="ml-3">
+                                        <em class="fas fa-trash mr-1"></em>
+                                    </a>
+                                }
+                            </span>
+                        </span>
+                    </h4>
+                </div>
+                <form asp-action="Index">
+                    <input type="hidden" asp-for="Filter.ClearAll" />
+                    <input type="hidden" asp-for="Filter.ItemRemoved" />
+                    <div id="collapseOne" class="collapse" data-parent="#accordion" style="">
+                        <div class="card-body" style="background-color:@(Model.Filter.IsNullOrEmpty() ? "#ffffff" : "#dcf1f4")">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        @foreach (var item in @Model.Filter.GetFields().OrderBy(o => o.PropertyType.FullName).ThenBy(o => o.Name))
+                                        {
+                                            if (item.PropertyType == typeof(bool) || item.PropertyType == typeof(Nullable<bool>))
+                                            {
+                                                var value = (item.GetValue(Model.Filter) as bool?);
+                                                <div class="col-md-2">
+                                                    <div class="form-group">
+                                                        <label class="control-label" for="Filter_@item.Name">
+                                                            @item.GetLable(langEnum,ExpressionTypes.BaseEntity)
+                                                        </label>
+                                                        <select asp-for="@value" id="Filter_@item.Name" name="Filter.@item.Name" class="form-control">
+                                                            <option selected="selected" value="">
+                                                                @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Please_Select.ToInt())
+                                                            </option>
+                                                            <option value="true">
+                                                                @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Yes.ToInt())
+                                                            </option>
+                                                            <option value="false">
+                                                                @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.No.ToInt())
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            }
+                                            else if (item.PropertyType == typeof(DateTime) || item.PropertyType == typeof(Nullable<DateTime>))
+                                            {
+                                                var value = (item.GetValue(Model.Filter) as DateTime?);
+                                                <div class="col-md-2">
+                                                    <div class="form-group">
+                                                        <label class="control-label" for="Filter_@item.Name">
+                                                            @item.GetLable(langEnum,ExpressionTypes.BaseEntity)
+                                                        </label>
+                                                        <input asp-for="@value" id="Filter_@item.Name" name="Filter.@item.Name" class="form-control" type="date" />
+                                                    </div>
+                                                </div>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <hr />
+                            <button id="searchButton" type="submit" class="btn btn-info btn-footer float-right">
+                                <em class="fas fa-search mr-2"></em>
+                                @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Search.ToInt())
+                            </button>
+                            @if (!Model.Filter.IsNullOrEmpty())
+                            {
+                                <a onclick="clear_all_filter()" class="btn btn-outline-info btn-footer float-right mr-1">
+                                    <em class="fas fa-trash mr-2"></em>
+                                    @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Clear_All_Filters.ToInt())
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-dark">
+                    <div class="card-body">
+                        @if (Model.Records.Any())
+                        {
+                            <table id="CustomDataTable" summary="forFaq" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th id="FirstColumn" class="no-sort no-vis state-column">
+                                        </th>
+                                        <th id="CodeColumn" class="colvis">
+                                            @SysExpressionHelper.Get(langEnum,ExpressionTypes.SysFaq, SysFaqExpression.SysFaq_Code.ToInt())
+                                        </th>
+                                        <th id="QuestionColumn" class="colvis">
+                                            @SysExpressionHelper.Get(langEnum,ExpressionTypes.SysFaq, SysFaqExpression.SysFaq_Question.ToInt())
+                                        </th>
+                                        <th id="ControllerNameColumn" class="colvis">
+                                            @SysExpressionHelper.Get(langEnum,ExpressionTypes.SysFaq, SysFaqExpression.SysFaq_ControllerName.ToInt())
+                                        </th>
+                                        <th id="LanguageColumn">
+                                            @SysExpressionHelper.Get(langEnum,ExpressionTypes.SysFaq, SysFaqExpression.SysFaq_Language.ToInt())
+                                        </th>
+                                        <th id="LastColumn" style="width:120px;text-align:center" class="no-sort no-vis">
+                                            <a asp-action="Create" style="color:forestgreen" title="@SysExpressionHelper.Get(langEnum,ExpressionTypes.SysFaq, SysFaqExpression.SysFaq_Create.ToInt())">
+                                                <em class="fa-solid fa-square-plus"></em>
+                                                <span class="text-xs text-bold">
+                                                    @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Create.ToInt())
+                                                </span>
+                                            </a>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.Records)
+                                    {
+                                        <tr style="@(item.Locked ? "background-color:#fff9e8" : (!item.Active ? "background-color:#f5eaec" : ""))">
+                                            <td class="state-column">
+                                                @if (item.Locked)
+                                                {
+                                                    <span class="fa fa-lock btn-custom-lock" title="@locked_lable"></span>
+                                                }
+                                                else
+                                                {
+                                                    @if (item.Active)
+                                                    {
+                                                        <a title="@Change_Status_lable" asp-action="ChangeState" asp-route-id="@item.Id" asp-route-activate="true" class="fas fa-toggle-on text-success"></a>
+                                                    }
+                                                    else
+                                                    {
+                                                        <a title="@Change_Status_lable" asp-action="ChangeState" asp-route-id="@item.Id" asp-route-activate="false" class="fas fa-toggle-off btn-custom-Inactive"></a>
+                                                    }
+                                                }
+                                            </td>
+                                            <td>
+                                                @item.Code
+                                            </td>
+                                            <td>
+                                                @item.Question
+                                            </td>
+                                            <td>
+                                                @item.ControllerName (@item.ViewName)
+                                            </td>
+                                            <td>
+                                                @item.Language
+                                            </td>
+                                            <td style="width:120px;text-align:center">
+                                                @if (item.Locked)
+                                                {
+                                                    <span class="fa fa-lock btn-custom-lock" title="@locked_lable"></span>
+                                                    <span class="text-xs text-bold">
+                                                        @locked_lable
+                                                    </span>
+                                                }
+                                                else if (!item.Active)
+                                                {
+                                                    <span class="fa-solid fa-eye-slash btn-custom-Inactive" title="@Inactive_lable"></span>
+                                                    <span class="text-xs text-bold">
+                                                        @Inactive_lable
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <a title="@Detail_lable" class="mr-2" style="color:#036b7c" asp-action="Detail" asp-route-id="@item.Id"><span class="fa-solid fa-eye"></span></a>
+                                                    <a title="@Edit_lable" class="mr-2" style="color:#036b7c" asp-action="Edit" asp-route-id="@item.Id"><span class="fa-solid fa-pencil"></span></a>
+                                                    <a title="@Delete_lable" style="color:#b90a2b" asp-action="Delete" asp-route-id="@item.Id"><em class="fa-solid fa-trash-can"></em></a>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                        else
+                        {
+                            <div class="text-center">
+                                <img alt="searching" src="~/img/searching.gif" />
+                                <p style="font-size:larger;font-weight:bolder;color: #abbcca;">
+                                    @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Sorry_No_Result_Found.ToInt())
+                                </p>
+                            </div>
+                        }
+                    </div>
+                    <div class="card-footer">
+                        @if (!Model.Records.Any())
+                        {
+                            <div class="float-right">
+                                <a asp-action="Create">
+                                    <em class="fa fa-plus mr-1"></em>
+                                    @SysExpressionHelper.Get(langEnum,ExpressionTypes.SysFaq, SysFaqExpression.SysFaq_Create.ToInt())
+                                </a>
+                            </div>
+                        }
+                        <a asp-controller="SysAssistance" asp-action="Help" asp-route-controllerName="SysFaq" asp-route-actionName="Index" title="@SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Help.ToInt())" class="mr-2" style="color:#036b7c"><em class="fa fa-info-circle"></em></a>
+                        <a asp-controller="SysAssistance" asp-action="Faq" asp-route-controllerName="SysFaq" asp-route-actionName="Index" title="@SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Faq.ToInt())" class="mr-2" style="color:#036b7c"><em class="fa fa-question-circle"></em></a>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

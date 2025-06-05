@@ -1,0 +1,447 @@
+﻿@model IEnumerable<SprintTask>
+
+@{
+    var langEnum = User.GetLoggedInUserLanguageEnum();
+    ViewData["Title"] = SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintReview, SprintReviewExpression.SprintReview.ToInt());
+    ViewData["Icon"] = "fas fa-user-secret";
+    ViewData["CurrentMenu"] = SysExpressionHelper.Get(langEnum, ExpressionTypes.SysMenu, SysMenuExpression.MyTasks.ToInt());
+
+    var Edit_lable = SysExpressionHelper.Get(langEnum, ExpressionTypes.Sprint, SprintExpression.Edit.ToInt());
+    var Delete_lable = SysExpressionHelper.Get(langEnum, ExpressionTypes.Sprint, SprintExpression.Delete.ToInt());
+    var User_TimeZone = User.GetLoggedInUserTimezoneId();
+    var OnlineUserId = User.GetLoggedInUserId();
+}
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="sticky-top mb-3">
+            <div style="background-color:#FFF;border: 1px solid #e9e9e9;border-radius:5px;padding:20px;">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div style="margin-top:5px;font-weight:bolder;">
+                            <h3 class="text-bold mb-0">
+                                @User.GetLoggedInFullName()
+                            </h3>
+                            <span>@Model.FirstOrDefault()?.Sprint.Title</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 float-right">
+                        <div>
+                            <span class="text-bold">
+                                @SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintReview, SprintReviewExpression.TotalEstimate.ToInt()):
+                            </span>
+                            @Model.Sum(c => c.Estimate)
+                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Hours.ToInt())
+                            <br>
+                            <span class="text-bold">
+                                @SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintReview, SprintReviewExpression.TotalRemained.ToInt()):
+                            </span>
+                            @Model.Sum(c => c.Remained)
+                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Hours.ToInt())
+                            <br>
+                            <span class="text-bold">
+                                @SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintReview, SprintReviewExpression.TotalCompleted.ToInt()):
+                            </span>
+                            @Model.Sum(c => c.Completed)
+                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Hours.ToInt())
+                        </div>
+                    </div>
+                    <div class="col-md-4 float-right">
+                        <span>
+                            @if (Model.Count() > 0)
+                            {
+                                <strong>
+                                    @SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintReview, SprintReviewExpression.SuccessPercentage.ToInt()):
+                                </strong>
+                                <h2 style="font-weight:bolder;margin-top:10px">
+                                    @if (Model.Where(c => c.Status == ProgressStatus.Done).Sum(s => s.Completed) == 0)
+                                    {
+                                        @:0 %
+                                    }
+                                    else
+                                    {
+                                        <span>
+                                            @(((Model.Where(c => c.Status == ProgressStatus.Done).Count() * 100) / @Model.Count()).ToString("#.##"))
+                                        </span>
+                                        @:%
+                                    }
+
+                                </h2>
+                            }
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="card card-warning">
+                        <div class="card-header">
+                            <h3>
+                                <i class="fa-regular fa-clock"></i>
+                                @SysParameterHelper.Get(langEnum, ParameterTypes.ProgressStatus, ProgressStatus.ToDo.ToInt())
+                            </h3>
+                        </div>
+                        <div class="card-body" style="min-height: 400px">
+                            @foreach (var task in Model.Where(c => c.Status == ProgressStatus.ToDo))
+                            {
+                                <div class="card">
+                                    <div class="card-header">
+                                        <span class="float-right">
+                                            @for (byte i = 1; i <= task.Priority.ToInt(); i++)
+                                            {
+                                                <i class="fas fa-star" style="color:goldenrod"></i>
+                                            }
+                                        </span>
+                                        <span class="badge badge-warning text-md">@task.Code </span>
+                                        <span class="text-bold ">@task.Title</span>
+                                    </div>
+                                    <div class="card-body">
+                                        <strong>
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Description.ToInt()):
+                                        </strong>
+                                        <br>
+                                        @Html.Raw(StringCompressor.Decompress(task.Description))
+                                        <br>
+                                        <strong>
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Deadline.ToInt()):
+                                        </strong>
+                                        @task.Deadline.ToString("dd/MM/yyyy")
+                                        <br>
+                                        <strong>
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Estimate.ToInt()):
+                                        </strong>
+                                        @task.Estimate
+                                        <br>
+                                        <strong>
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Remained.ToInt()):
+                                        </strong>
+                                        @task.Remained
+                                        <br>
+                                        <strong>
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Completed.ToInt()):
+                                        </strong>
+                                        @task.Completed
+
+                                    </div>
+                                    <div class="card-footer">
+                                        <a class="text-secondary" href="" onclick="event.preventDefault();openModal('@task.Id','@task.Remained','@task.Completed')">
+                                            <em class="fas fa-clock">
+                                            </em>
+                                        </a>
+                                        <div class="float-right">
+                                            <a asp-action="MakeInProgress" asp-route-id="@task.Id">
+                                                <span class="btn btn-info btn-xs" style="border-radius: 0.35rem">
+                                                    @SysParameterHelper.Get(langEnum, ParameterTypes.ProgressStatus, ProgressStatus.InProgress.ToInt())
+                                                </span>
+                                            </a>
+                                            <a asp-action="MakeDone" asp-route-id="@task.Id">
+                                                <span class="btn btn-success btn-xs" style="border-radius: 0.35rem">
+                                                    @SysParameterHelper.Get(langEnum, ParameterTypes.ProgressStatus, ProgressStatus.Done.ToInt())
+                                                </span>
+                                            </a>
+                                            <a asp-action="MakeCancel" asp-route-id="@task.Id">
+                                                <span class="btn btn-danger btn-xs" style="border-radius: 0.35rem">
+                                                    @SysParameterHelper.Get(langEnum, ParameterTypes.ProgressStatus, ProgressStatus.Cancel.ToInt())
+                                                </span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="card card-info">
+                        <div class="card-header">
+                            <h3>
+                                <i class="fa-regular fa-hand"></i>
+                                @SysParameterHelper.Get(langEnum, ParameterTypes.ProgressStatus, ProgressStatus.InProgress.ToInt())
+                            </h3>
+                        </div>
+                        <div class="card-body" style="min-height: 400px">
+                            @foreach (var task in Model.Where(c => c.Status == ProgressStatus.InProgress))
+                            {
+                                <div class="card">
+                                    <div class="card-header">
+                                        <span class="float-right">
+                                            @for (byte i = 1; i <= task.Priority.ToInt(); i++)
+                                            {
+                                                <i class="fas fa-star" style="color:goldenrod"></i>
+                                            }
+                                        </span>
+                                        <span class="badge badge-info text-md">@task.Code </span>
+                                        <span class="text-bold ">@task.Title</span>
+                                    </div>
+                                    <div class="card-body">
+                                        <strong>
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Description.ToInt()):
+                                        </strong>
+                                        <br>
+                                        @Html.Raw(StringCompressor.Decompress(task.Description))
+                                        <br>
+                                        <strong>
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Deadline.ToInt()):
+                                        </strong>
+                                        @task.Deadline.ToString("dd/MM/yyyy")
+                                        <br>
+                                        <strong>
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Estimate.ToInt()):
+                                        </strong>
+                                        @task.Estimate
+                                        <br>
+                                        <strong>
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Remained.ToInt()):
+                                        </strong>
+                                        @task.Remained
+                                        <br>
+                                        <strong>
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Completed.ToInt()):
+                                        </strong>
+                                        @task.Completed
+
+                                    </div>
+                                    <div class="card-footer">
+
+                                        <a class="text-secondary" href="" onclick="event.preventDefault();openModal('@task.Id','@task.Remained','@task.Completed')">
+                                            <em class="fas fa-clock">
+                                            </em>
+                                        </a>
+                                        <div class="float-right">
+                                            <a asp-action="MakeTodo" asp-route-id="@task.Id">
+                                                <span class="btn btn-warning btn-xs" style="border-radius: 0.35rem">
+                                                    @SysParameterHelper.Get(langEnum, ParameterTypes.ProgressStatus, ProgressStatus.ToDo.ToInt())
+                                                </span>
+                                            </a>
+                                            <a asp-action="MakeDone" asp-route-id="@task.Id">
+                                                <span class="btn btn-success btn-xs" style="border-radius: 0.35rem">
+                                                    @SysParameterHelper.Get(langEnum, ParameterTypes.ProgressStatus, ProgressStatus.Done.ToInt())
+                                                </span>
+                                            </a>
+                                            <a asp-action="MakeCancel" asp-route-id="@task.Id">
+                                                <span class="btn btn-danger btn-xs" style="border-radius: 0.35rem">
+                                                    @SysParameterHelper.Get(langEnum, ParameterTypes.ProgressStatus, ProgressStatus.Cancel.ToInt())
+                                                </span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card card-success">
+                        <div class="card-header">
+                            <h3>
+                                <i class="fa-solid fa-check"></i>
+                                @SysParameterHelper.Get(langEnum, ParameterTypes.ProgressStatus, ProgressStatus.Done.ToInt())
+                            </h3>
+                        </div>
+                        <div class="card-body" style="min-height: 400px">
+                            @foreach (var task in Model.Where(c => c.Status == ProgressStatus.Done))
+                            {
+                                <div class="card">
+                                    <div class="card-header">
+                                        <span class="float-right">
+                                            @for (byte i = 1; i <= task.Priority.ToInt(); i++)
+                                            {
+                                                <i class="fas fa-star" style="color:goldenrod"></i>
+                                            }
+                                        </span>
+                                        <span class="badge badge-success text-md">@task.Code </span>
+                                        <span class="text-bold ">@task.Title</span>
+                                    </div>
+                                    <div class="card-body">
+                                        <strong>
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Description.ToInt()):
+                                        </strong>
+                                        <br>
+                                        @Html.Raw(StringCompressor.Decompress(task.Description))
+                                        <br>
+                                        <strong>
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Deadline.ToInt()):
+                                        </strong>
+                                        @task.Deadline.ToString("dd/MM/yyyy")
+                                        <br>
+                                        <strong>
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Estimate.ToInt()):
+                                        </strong>
+                                        @task.Estimate
+                                        <br>
+                                        <strong>
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Remained.ToInt()):
+                                        </strong>
+                                        @task.Remained
+                                        <br>
+                                        <strong>
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Completed.ToInt()):
+                                        </strong>
+                                        @task.Completed
+                                    </div>
+                                    <div class="card-footer">
+                                        <div class="float-right">
+                                            <a asp-action="MakeTodo" asp-route-id="@task.Id">
+                                                <span class="btn btn-warning btn-xs" style="border-radius: 0.35rem">
+                                                    @SysParameterHelper.Get(langEnum, ParameterTypes.ProgressStatus, ProgressStatus.ToDo.ToInt())
+                                                </span>
+                                            </a>
+                                            <a asp-action="MakeInProgress" asp-route-id="@task.Id">
+                                                <span class="btn btn-info btn-xs" style="border-radius: 0.35rem">
+                                                    @SysParameterHelper.Get(langEnum, ParameterTypes.ProgressStatus, ProgressStatus.InProgress.ToInt())
+                                                </span>
+                                            </a>
+                                            <a asp-action="MakeCancel" asp-route-id="@task.Id">
+                                                <span class="btn btn-danger btn-xs" style="border-radius: 0.35rem">
+                                                    @SysParameterHelper.Get(langEnum, ParameterTypes.ProgressStatus, ProgressStatus.Cancel.ToInt())
+                                                </span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card card-danger">
+                        <div class="card-header">
+                            <h3>
+                                <i class="fa-solid fa-xmark"></i>
+                                @SysParameterHelper.Get(langEnum, ParameterTypes.ProgressStatus, ProgressStatus.Cancel.ToInt())
+                            </h3>
+                        </div>
+                        <div class="card-body" style="min-height: 400px">
+                            @foreach (var task in Model.Where(c => c.Status == ProgressStatus.Cancel))
+                            {
+                                <div class="card">
+                                    <div class="card-header">
+                                        <span class="float-right">
+                                            @for (byte i = 1; i <= task.Priority.ToInt(); i++)
+                                            {
+                                                <i class="fas fa-star" style="color:goldenrod"></i>
+                                            }
+                                        </span>
+                                        <span class="badge badge-danger text-md">@task.Code </span>
+                                        <span class="text-bold ">@task.Title</span>
+                                    </div>
+                                    <div class="card-body">
+                                        <strong>
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Description.ToInt()):
+                                        </strong>
+                                        <br>
+                                        @Html.Raw(StringCompressor.Decompress(task.Description))
+                                        <br>
+                                        <strong>
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Deadline.ToInt()):
+                                        </strong>
+                                        @task.Deadline.ToString("dd/MM/yyyy")
+                                        <br>
+                                        <strong>
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Estimate.ToInt()):
+                                        </strong>
+                                        @task.Estimate
+                                        <br>
+                                        <strong>
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Remained.ToInt()):
+                                        </strong>
+                                        @task.Remained
+                                        <br>
+                                        <strong>
+                                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Completed.ToInt()):
+                                        </strong>
+                                        @task.Completed
+
+                                    </div>
+                                    <div class="card-footer">
+                                        <div class="float-right">
+                                            <a asp-action="MakeTodo" asp-route-id="@task.Id">
+                                                <span class="btn btn-warning btn-xs" style="border-radius: 0.35rem">
+                                                    @SysParameterHelper.Get(langEnum, ParameterTypes.ProgressStatus, ProgressStatus.ToDo.ToInt())
+                                                </span>
+                                            </a>
+                                            <a asp-action="MakeInProgress" asp-route-id="@task.Id">
+                                                <span class="btn btn-info btn-xs" style="border-radius: 0.35rem">
+                                                    @SysParameterHelper.Get(langEnum, ParameterTypes.ProgressStatus, ProgressStatus.InProgress.ToInt())
+                                                </span>
+                                            </a>
+                                            <a asp-action="MakeDone" asp-route-id="@task.Id">
+                                                <span class="btn btn-success btn-xs" style="border-radius: 0.35rem">
+                                                    @SysParameterHelper.Get(langEnum, ParameterTypes.ProgressStatus, ProgressStatus.Done.ToInt())
+                                                </span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-dark-info text-white">
+                <h5 class="modal-title" id="modalTitle">
+                    @SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintReview, SprintReviewExpression.TimeModification.ToInt())
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form asp-action="Save" id="saveForm" class="needs-validation" novalidate>
+                <input name="Id" id="Id" type="hidden" class="form-control" required autocomplete="off" />
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="row">
+                                <div class="form-group col-12">
+                                    <label class="control-label" for="Remained">
+                                        @SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Remained.ToInt())
+                                    </label>
+                                    <input name="Remained" id="Remained" class="form-control" required autocomplete="off" />
+                                    <div class="invalid-feedback text-size-10" for="Remained">
+                                        @SysExpressionHelper.Get(langEnum, ExpressionTypes.BaseEntity, BaseEntityExpression.Requiered_Validation_Message.ToInt() , (ExpressionParamConstants.Field, SysExpressionHelper.Get(langEnum,ExpressionTypes.SprintTask,SprintTaskExpression.Remained.ToInt())))
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="row">
+                                <div class="form-group col-12">
+                                    <label class="control-label" for="Completed">
+                                        @SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Completed.ToInt())
+                                    </label>
+                                    <input name="Completed" id="Completed" class="form-control" required autocomplete="off" />
+                                    <div class="invalid-feedback text-size-10" for="Completed">
+                                        @SysExpressionHelper.Get(langEnum, ExpressionTypes.BaseEntity, BaseEntityExpression.Requiered_Validation_Message.ToInt() , (ExpressionParamConstants.Field, SysExpressionHelper.Get(langEnum,ExpressionTypes.SprintTask,SprintTaskExpression.Completed.ToInt())))
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="searchButton" type="submit" class="btn btn-info btn-footer float-right">
+                        <em class="fas fa-plus mr-2"></em>
+                        @SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Save.ToInt())
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script asp-append-version="true" src="~/js/pages/my_tasks.js"></script>
+    <script>
+        var editTitle = '@SysExpressionHelper.Get(langEnum, ExpressionTypes.SprintTask, SprintTaskExpression.Edit.ToInt())';
+    </script>
+}

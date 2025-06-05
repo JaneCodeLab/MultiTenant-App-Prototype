@@ -1,0 +1,58 @@
+﻿@model ErrorViewModel
+@{
+    var langEnum = User.GetLoggedInUserLanguageEnum();
+    ViewData["Title"] = SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Failed.ToInt() );
+}
+
+<section class="content pt-3">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-info">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <em class="fa fa-bug"></em>
+                            @SysExpressionHelper.Get(langEnum, ExpressionTypes.SysException,SysExceptionExpression.SysException.ToInt())
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12" style="text-align:center">
+                                <img alt="workingIcon" src="/img/working/working2.gif" style="height:300px;" />
+                            </div>
+                            <div class="col-md-12" style="text-align:center">
+                                <strong>
+                                    @Html.Raw(SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Error_Page_Description.ToInt()))
+                                </strong>
+                            </div>
+                            <div class="col-md-12" style="text-align:center;margin-top:10px;">
+                                @if (Model.ShowRequestId)
+                                {
+                                    <span id="RefCode" class="btn btn-danger" onclick="navigator.clipboard.writeText($('#RefCode').text()); alert('copied!')">
+                                        <em class="fa-solid fa-copy"></em>
+                                        @Model.RequestId
+                                    </span>
+                                }
+                                @if (User.IsInRole(Roles.DevPersonnel) || User.IsInRole(Roles.Admin))
+                                {
+                                    <a class="btn btn-primary" asp-controller="SysException" asp-action="Detail" asp-route-id="@Model.RequestId">
+                                        <em class="fa-solid fa-eye"></em>
+                                        @SysExpressionHelper.Get(langEnum,ExpressionTypes.SysApiLog,SysApiLogExpression.ApiLog_Detail.ToInt())
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" title="@SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Help.ToInt())">
+                            <em class="fa fa-info-circle"></em>
+                        </a>
+                        <a href="#" title="@SysExpressionHelper.Get(langEnum, ExpressionTypes.General, GeneralExpression.Faq.ToInt())" class="ml-2">
+                            <em class="fa fa-question-circle"></em>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

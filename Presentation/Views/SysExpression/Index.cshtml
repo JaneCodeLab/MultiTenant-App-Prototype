@@ -1,0 +1,95 @@
+﻿@model List<DtoSysExpression>
+@{
+    var langEnum = User.GetLoggedInUserLanguageEnum();
+    ViewData["Title"] = SysExpressionHelper.Get(langEnum, ExpressionTypes.SysMenu, SysMenuExpression.Expressions.ToInt());
+    ViewData["Icon"] = "fa-solid fa-user-tag";
+    ViewData["CurrentMenu"] = SysExpressionHelper.Get(langEnum, ExpressionTypes.SysMenu, SysMenuExpression.Expressions.ToInt());
+}
+<section class="content pt-3">
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-dark">
+                    <div class="card-body">
+                        <table summary="forLanguages" id="MyCustomDataTable" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th id="FirstColumn" class="bg-light">
+                                        Category
+                                    </th>
+                                    <th id="FirstColumn" class="bg-light">
+                                        Keyword
+                                    </th>
+                                    @foreach (Language lang in (Language[])Enum.GetValues(typeof(Language)))
+                                    {
+                                        <th id="@((int)lang)Column" class="bg-light">
+                                            <img alt="LanguageFlag" src="~/img/flags/@((int)lang).png" style="height:20px;margin-right:5px;">
+                                            @lang.GetDisplayName()
+                                        </th>
+                                    }
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.GroupBy(g => new { g.ExpressionType, g.ExpressionItem }))
+                                {
+                                    <tr>
+                                        <td class="bg-light">
+                                            @(item.Key.ExpressionType)
+                                        </td>
+                                        <td class="bg-light">
+                                            @SysExpressionHelper.FindPureName(item.Key.ExpressionType, item.Key.ExpressionItem)
+                                        </td>
+                                        @foreach (Language lang in (Language[])Enum.GetValues(typeof(Language)))
+                                        {
+                                            <td class="text-bold">
+                                                <a asp-action="Edit" asp-route-id="@item.FirstOrDefault(c=>c.Language == lang)?.Id">
+                                                    @if (string.IsNullOrEmpty(item.FirstOrDefault(c => c.Language == lang)?.Equivalent))
+                                                    {
+                                                        <span class="fa-solid fa-triangle-exclamation text-orange"></span>
+                                                        <span style="color:#bb3e0e">
+                                                            @SysExpressionHelper.Get(langEnum,ExpressionTypes.General,GeneralExpression.Not_Defined.ToInt())
+                                                        </span>
+                                                    }
+                                                    @item.FirstOrDefault(c=>c.Language == lang)?.Equivalent
+                                                </a>
+                                            </td>
+                                        }
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer">
+                        <a asp-controller="SysAssistance" asp-action="Help" asp-route-controllerName="LanguageReport" asp-route-actionName="Index" title="@SysExpressionHelper.Get(langEnum,ExpressionTypes.General, GeneralExpression.Help.ToInt())" class="mr-2" style="color:#036b7c"><em class="fa fa-info-circle"></em></a>
+                        <a asp-controller="SysAssistance" asp-action="Faq" asp-route-controllerName="LanguageReport" asp-route-actionName="Index" title="@SysExpressionHelper.Get(langEnum,ExpressionTypes.General, GeneralExpression.Faq.ToInt())" class="mr-2" style="color:#036b7c"><em class="fa fa-question-circle"></em></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section scripts{
+    <script>
+        $(function () {
+            $("#MyCustomDataTable").DataTable({
+                "oLanguage": { "sSearch": "" }, "bInfo": false,
+                "language": { 'paginate': { 'previous': '<em class="fa-solid fa-angles-left"></em>', 'next': '<em class="fa-solid fa-angles-right"></em>' } },
+                "responsive": true, "lengthChange": false, "autoWidth": false, "paging": false,
+                "buttons": ["copy", "csv", "excel", "pdf", "print", { extend: 'colvis', columns: ':not(.noVis)' }],
+                "columnDefs": [{ "targets": 'no-sort', "orderable": false },
+                { "targets": 'no-vis', "className": 'noVis' }]
+            }).buttons().container().appendTo('#MyCustomDataTable_wrapper  .col-md-6:eq(0)');
+            var table = $('#MyCustomDataTable').DataTable();
+            console.log(table.buttons().text());
+            table.buttons('.buttons-copy').text('<em class="fa-solid fa-copy"></em> ');
+            table.buttons('.buttons-csv').text('<em class="fa-solid fa-file-csv"></em>');
+            table.buttons('.buttons-excel').text('<em class="fa-solid fa-file-excel"></em>');
+            table.buttons('.buttons-pdf').text('<em class="fa-solid fa-file-pdf"></em>');
+            table.buttons('.buttons-print').text('<em class="fa-solid fa-print"></em>');
+            table.buttons('.buttons-collection').text('');
+            $('#MyCustomDataTable_filter > label > input[type=search]').each(function () { $(this).before('<em class="fas fa-search fa-fw" style="margin-left: -20px;"></em>') });
+        });
+    </script>
+}

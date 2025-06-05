@@ -1,0 +1,303 @@
+﻿@using Microsoft.AspNetCore.Identity
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@GeneralVariables.ApplicationName - @ViewData["Title"]</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+
+    <link rel="stylesheet" href="~/plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
+    <link rel="stylesheet" href="~/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+    <link rel="stylesheet" href="~/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <link rel="stylesheet" href="~/plugins/jqvmap/jqvmap.min.css">
+    <link rel="stylesheet" href="~/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="~/plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
+    <link rel="stylesheet" href="~/plugins/daterangepicker/daterangepicker.css">
+    <link rel="stylesheet" href="~/plugins/summernote/summernote-bs4.min.css">
+    <link rel="stylesheet" href="~/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="~/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+    <link rel="stylesheet" href="~/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
+    <link rel="stylesheet" href="~/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css" />
+    <link rel="stylesheet" href="~/plugins/toastr/toastr.min.css">
+    <link rel="stylesheet" href="~/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="~/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+    <link rel="stylesheet" href="~/css/site.css">
+    <link rel="stylesheet" href="~/plugins/fullcalendar/main.css">
+    <script src="~/plugins/jquery/jquery.min.js"></script>
+
+</head>
+<body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed text-sm" style="background-color: #f4f6f9;">
+    <div class="wrapper">
+
+        <div class="preloader flex-column justify-content-center align-items-center">
+        </div>
+
+        <nav class="main-header navbar navbar-expand navbar-dark bg-dark-info">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><em class="fas fa-bars"></em></a>
+                </li>
+                @if (!User.IsInRole(Roles.Admin))
+                {
+                    <li class="nav-item dropdown" style="border:1px solid #cad2ca">
+                        <a class="nav-link" data-toggle="dropdown" href="" onclick="event.preventDefault();openSquadModal()">
+                            @if (int.Parse(User.GetLoggedInUserSquadCounts()) == 1)
+                            {
+                                <em class="fas fa-people-group mr-2"></em>
+                            }
+                            else
+                            {
+                                <em class="fas fa-beat-fade fa-people-group mr-2"></em>
+                            }
+                            @User.GetLoggedInUserSquadTitle()
+                        </a>
+                    </li>
+                }
+            </ul>
+
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link" data-toggle="dropdown" href="#">
+                        <span class="fa-solid fa-clock"></span>
+                        @User.GetLoggedInUserTimezone().DisplayName
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-md dropdown-menu-right" style="max-height:200px; overflow-y:scroll">
+                        @foreach (var option in TimeZoneOptions.GetTimeZoneList())
+                        {
+                            <a href="~/ChangeUserSettings/ChangeTimeZone?timeZone=@option.Id&returnUrl=@Url.RouteUrl(ViewContext.RouteData.Values)"
+                               class="dropdown-item"
+                               style="@(option.Id == User.GetLoggedInUserTimezoneId() ? "background-color: #4d4b70; color:white" : "")">
+                                @option.Title
+                            </a>
+                        }
+                    </div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link" data-toggle="dropdown" href="#">
+                        <span class="fas fa-language nav-icon text-white"></span>
+                        @User.GetLoggedInUserLanguageEnum().GetDisplayName()
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-md dropdown-menu-right">
+                        @foreach (Language item in (Language[])Enum.GetValues(typeof(Language)))
+                        {
+                            @if ((int)item > 1)
+                            {
+                                <div class="dropdown-divider"></div>
+                            }
+                            <a href="~/ChangeUserSettings/ChangeLanguage?language=@item&returnUrl=@((Url.RouteUrl(ViewContext.RouteData.Values)+Context.Request.QueryString).Replace("&","@"))"
+                               class="dropdown-item">
+                                <img alt="flags" src="~/img/flags/@((int)item).png" style="height:20px;margin-top:-2px;" />
+                                @item.GetDisplayName()
+                            </a>
+                        }
+                    </div>
+                </li>
+
+                <li class="nav-item">
+                    <a asp-area="Identity" asp-page="/Account/Logout" class="nav-link">
+                        <em class="fas fa-sign-out-alt"></em>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <aside class="main-sidebar sidebar-dark-secondary elevation-4 sidebar-no-expand">
+            <a href="/" class="brand-link bg-dark-info">
+                <img alt="logow" src="~/img/logoSm.png" alt="@GeneralVariables.ApplicationBrandName" class="brand-image" style="opacity: .8">
+                <span class="brand-text font-weight-bold">@GeneralVariables.ApplicationBrandName</span>
+            </a>
+
+            <div class="sidebar">
+                <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+                    <div class="image">
+                        <img alt="UserImage" src="@(!string.IsNullOrEmpty(User.GetLoggedInUserImage()) ? "/img/user/general/"+User.GetLoggedInUserImage() : "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAMAAABHPGVmAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAActQTFRF5Obn5efo4+Xm3+Lj3N/g2t3e2tze293f3d/h4OPk5Obm5ujp297fxMjKuL7As7i7r7W4rbO2rbS3sLa5tLq8u8DDzNDSyc3PtLq9rLK1rrS3vMHD0dXW4ePkx8vOsre609fZz9LUsbe6uL2/3d/g4uTlvsPGzdHS3uDhwsbJ5OXm1tnbur/CwMTHs7m8rrO2vsPFuL3AzM/R5ebn2NvcrbO3u8DC0NTVsbe5tLm8yczP2dzd4ePl09bY3+Hiv8TG0tXXw8jKt72/xsrM3uHivMHE1dna5ufoy8/QrLK24+bmyMzOx8vNys7QztLU1djZs7i83uDit7y/w8fJ0tbX0dTW4OLj5ufp19rcsba5ur/B19nb5Ofn2dvdtry+ys3Psri7vMDDr7a44uXm1NfZu8HDy8/Rtru+sLW43eDhxsvNr7S3ub7B5ujowcbH297g5efn2Nvd2dze3+Hj5Ofo1NfYv8THtbu9q7G0qrG0q7K1q7G10dXXtbq9sLa44+bn4+Xltbu+r7W3v8PGz9PV5OXn4eTlxcnL3N7gwcbI4+Xn5efp0NPVxcrM4uTm4eLk1tnawsfJ1djaxMnLt73A4uXlwMXHrrO3ztHTD7SJEwAAA4JJREFUeJztmelfEkEYgGc4LAWFXTxivILC8CINTM3yhMy8SpPQ0qxI8yrtpEPL7vvO+nNbEJQ4duedne3XB55vfHp+77zHzjsglCNHjhyZwTq9wZi3Z29+AdbIYDIXFlmsgoRoKy4pzefvwfqyfXayiyQrr+DsqKwSSBpC9X6OCpPDma6IaQ4c5OVw1WQII8EhPqlxW7IrpGBq6zg46rMcVQKxoVK1w2yTd0g06lQ63B5FBzncpDIvzcoOKS9H1Ci8ZTJ1lYxRhcTXQucgReyOgqOUDiKWMUtaaR2EtHkZHbidXkKOMVZYB2XWYziPswVSDnAQ4QSTpBPiIKTLxCLphkk8LCMM98AkhOW8cC/MIfYxSPwKIz6NAEMRnwQ6iIch8w5Il8ToBzt0p6CSgdNwyaAIlNjhNawbAkvy/9NIhmk/WDsSeE7QCLi6GPpkFOo4w9AnZ/9Fx+MxmKOFZXbhcZhEOMcgQRMwiSXIIvHDJDXnWSSY+tYVhe20EApBOmWScYHAsttPCkOsN3sHvcPGqJDm1xS1ZJBZgi7QZmVMxbJ1kfajMs3ukJihUQiXVDmQYZZCclntLm+8ouhouqrSgVBYacduZhpaKRgmZfPRpXaL3yb/mkwlD3NRSJjmshyZMJ/H8WktWGjP4LheweeoEuCFxdlkz5IoLI/wVcRYCd2YcZLoG6RgnV0edDOtb8p4kcttnPZ13NTrNHlN1a1i04ouuGDsCIXWbhluu6Sfd3gKMAqa7w7fu2+NPIg8tEd5FImIlsDQ445OLiHhytBczfpGlkYRrJ6SqrAerbILnuCn4Z7NAWFJruOfEXv18xdB1ip4WT8l0H60hGLHK4aDM7wuBl3rBWdXCNY32DxuhRjinkCYPhr8JjAAV8Q065Qar/8tQxQ7NPhownBArnSZ6HunFIaxCLzFpeGseC8r+QBdrzLz8ZNMHOPqw9hm/nM2hx74+CTH5JfM43Nhk59DuoGHM1ncyn8vgBC60x2Gar4OQsTW1OEcXOftIGQjpS/rSvg7CJk1JzvwV161+zfzyRLqZQdKYVJCOBfWLi3fdg7ru1YOQn78jEt8aka7AkJ8Y8WaVFaC+O7tZ/wMUlIa/Y8Ib2nqIG3Rsd+pYUaixP69mfilrYTU9iNTo8YO0u5CLg0mYwqjaE3jlEhJKUO/tRpbuzSiReiTPJxetGXXHNsf8nUnMnQs1OYAAAAASUVORK5CYII=")"
+                             class="img-circle elevation-2" alt="User Image">
+                    </div>
+                    <div class="info">
+                        <a href="/Identity/Account/Manage/ChangePassword" class="d-block">
+                            @User.GetLoggedInFullName()
+                        </a>
+                    </div>
+                </div>
+
+                <div class="form-inline">
+                    <div class="input-group" data-widget="sidebar-search">
+                        <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
+                        <div class="input-group-append">
+                            <button class="btn btn-sidebar">
+                                <em class="fas fa-search fa-fw"></em>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <nav class="mt-2">
+                    <ul class="nav nav-pills nav-sidebar flex-column nav-compact nav-legacy nav-flat" data-widget="treeview" role="menu" data-accordion="false">
+                        @await Component.InvokeAsync("Menu", new { currentMenu = ViewData["CurrentMenu"], user = User })
+                    </ul>
+                </nav>
+            </div>
+        </aside>
+        <div class="content-wrapper">
+            <div class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb text-bold">
+                                <li class="breadcrumb-item">
+                                    <a href="~/">
+                                        @SysExpressionHelper.Get(User.GetLoggedInUserLanguageEnum(), ExpressionTypes.General, GeneralExpression.Home.ToInt())
+                                        @if (!User.IsInRole(Roles.Admin))
+                                        {
+                                            @:( @User.GetCurrentTenantName() )
+                                        }
+                                    </a>
+                                </li>
+                                @foreach (var item in (List<PathNavigator>)ViewData["Path"])
+                                {
+                                    <li class="breadcrumb-item"><a href="@item.Address">@item.Title</a></li>
+                                }
+                                @if (!string.IsNullOrEmpty(ViewData["Title"]?.ToString()))
+                                {
+                                    <li class="breadcrumb-item active">
+                                        @ViewData["Title"]
+                                    </li>
+                                }
+                            </ol>
+                        </div>
+                        @if (!User.IsInRole(Roles.Admin))
+                        {
+                            <div class="col-sm-6">
+                                <div class=" float-right">
+                                    <a asp-controller="ChooseTenant" asp-action="Index" asp-route-returnUrl="/" class="nav-link">
+                                        @if (string.IsNullOrEmpty(User.GetCurrentTenantLogo()))
+                                        {
+                                            <label class=" text-bold text-lg">@User.GetCurrentTenantName()</label>
+                                        }
+                                        else
+                                        {
+                                            <img alt="@User.GetCurrentTenantName()" src="~/img/tenant/@User.GetCurrentTenantLogo()" style="height:30px;" />
+                                        }
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <section class="content ">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            @RenderBody()
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <footer class="main-footer">
+            <strong>Copyright &copy; 2024-2026 <a href="#">@GeneralVariables.ApplicationBrandName</a>.</strong>
+            All rights reserved.
+            <div class="float-right d-none d-sm-inline-block">
+                <a asp-controller="Home" asp-action="VersionHistory">
+                    <strong>Version</strong> @GeneralVariables.LatestVersionNo
+                </a>
+            </div>
+        </footer>
+    </div>
+    @if (!User.IsInRole(Roles.Admin))
+    {
+        <div class="modal fade" id="SquadModal" role="dialog">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-dark-info text-white">
+                        <h5 class="modal-title" id="modalTitle">
+                        </h5>
+                        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form asp-action="ChangeSquad" id="ChangeSquad" class="needs-validation" novalidate>
+
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="row">
+                                        <div class="form-group col-12">
+                                            <label class="control-label" for="Remained">
+                                                @SysExpressionHelper.Get(User.GetLoggedInUserLanguageEnum(), ExpressionTypes.Department, DepartmentExpression.Departments.ToInt())
+                                            </label>
+                                            <select name="squadId" id="squadId" class="form-control" required>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="searchButton" type="submit" class="btn btn-info btn-footer float-right">
+                                <em class="fas fa-check mr-2"></em>
+                                @SysExpressionHelper.Get(User.GetLoggedInUserLanguageEnum(), ExpressionTypes.General, GeneralExpression.Ok.ToInt())
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+
+    <script src="~/plugins/jquery/jquery.min.js"></script>
+    <script src="~/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
+    <script src="~/dist/js/adminlte.js"></script>
+    <script src="~/plugins/jquery-mousewheel/jquery.mousewheel.js"></script>
+    <script src="~/plugins/raphael/raphael.min.js"></script>
+    <script src="~/plugins/jquery-mapael/jquery.mapael.min.js"></script>
+    <script src="~/plugins/jquery-mapael/maps/usa_states.min.js"></script>
+    <script src="~/plugins/chart.js/Chart.min.js"></script>
+    <script src="~/plugins/select2/js/select2.full.min.js"></script>
+
+    <script asp-append-version="true" src="~/plugins/daterangepicker/daterangepicker.js"></script>
+    <script asp-append-version="true" src="~/plugins/jquery-knob/jquery.knob.min.js"></script>
+    <script asp-append-version="true" src="~/plugins/fullcalendar/main.js"></script>
+    <script asp-append-version="true" src="~/plugins/sparklines/sparkline.js"></script>
+    <script asp-append-version="true" src="~/plugins/moment/moment.min.js"></script>
+    <script asp-append-version="true" src="~/plugins/summernote/summernote-bs4.min.js"></script>
+    <script asp-append-version="true" src="~/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
+    <script asp-append-version="true" src="~/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
+    <script asp-append-version="true" src="~/plugins/datatables/jquery.dataTables.min.js"></script>
+    <script asp-append-version="true" src="~/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script asp-append-version="true" src="~/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+    <script asp-append-version="true" src="~/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+    <script asp-append-version="true" src="~/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+    <script asp-append-version="true" src="~/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+    <script asp-append-version="true" src="~/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
+    <script asp-append-version="true" src="~/plugins/datatables-buttons/js/buttons.print.min.js"></script>
+    <script asp-append-version="true" src="~/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
+    <script asp-append-version="true" src="~/plugins/jszip/jszip.min.js"></script>
+    <script asp-append-version="true" src="~/plugins/pdfmake/pdfmake.min.js"></script>
+    <script asp-append-version="true" src="~/plugins/pdfmake/vfs_fonts.js"></script>
+    <script asp-append-version="true" src="~/plugins/moment/moment.min.js"></script>
+    <script asp-append-version="true" src="~/plugins/chart.js/Chart.min.js"></script>
+    <script asp-append-version="true" src="~/plugins/inputmask/jquery.inputmask.js"></script>
+    <script asp-append-version="true" src="~/plugins/jquery-block-ui/jquery.blockUI.js"></script>
+    <script asp-append-version="true" src="~/plugins/sweetalert2/sweetalert2.min.js"></script>
+    <script asp-append-version="true" src="~/js/site.js"></script>
+    <script asp-append-version="true" src="~/js/pages/SquadSelector.js"></script>
+    <script>
+        var SquadSelection = '@SysExpressionHelper.Get(User.GetLoggedInUserLanguageEnum(), ExpressionTypes.General, GeneralExpression.SquadSelection.ToInt())';
+        var successMessageTitle = '@SysExpressionHelper.Get(User.GetLoggedInUserLanguageEnum(), ExpressionTypes.General, GeneralExpression.MessageBox_Success_Title.ToInt())';
+        var failedMessageTitle = '@SysExpressionHelper.Get(User.GetLoggedInUserLanguageEnum(), ExpressionTypes.General, GeneralExpression.MessageBox_Failed_Title.ToInt())';
+        var infoMessageTitle = '@SysExpressionHelper.Get(User.GetLoggedInUserLanguageEnum(), ExpressionTypes.General, GeneralExpression.MessageBox_Info_Title.ToInt())';
+        var loadingText = '@SysExpressionHelper.Get(User.GetLoggedInUserLanguageEnum(), ExpressionTypes.General, GeneralExpression.Loading.ToInt())...';
+        var datatablesInfoText = '@SysExpressionHelper.Get(User.GetLoggedInUserLanguageEnum(), ExpressionTypes.General, GeneralExpression.Datatables_Info_Text.ToInt())';
+        window.tenantName = '@User.GetCurrentTenantName()';
+        window.pageTitle = '@ViewData["Title"]';
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
