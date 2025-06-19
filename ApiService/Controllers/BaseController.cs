@@ -11,38 +11,44 @@ namespace ApiService.Controllers
     [Authorize]
     public class BaseController : Controller
     {
+        private const string TenantIdHeader = "tenant-id";
+        private const string LanguageHeader = "language";
         public readonly string _defaultTimeZone = GeneralVariables.DefaultTimeZone;
-        public static Language _defaultLanguage = Language.English;
-        public int _tenantId = 0;
+
+        protected int TenantId { get; private set; }
+        protected Language RequestLanguage { get; private set; } = Language.English;
 
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            var request = context.HttpContext.Request;
-            var requestHeader = request.Headers;
-            if (!requestHeader.TryGetValue("tenant-id", out var tenantId))
-            {
-                context.Result = new BadRequestObjectResult("tenant-id cannot be null.");
-                return;
-            }
-            else if (!int.TryParse(tenantId, out int intTenantId))
-            {
-                context.Result = new BadRequestObjectResult("tenant-id is not valid!");
-                return;
-            }
-            else
-                _tenantId = intTenantId;
+            var headers = context.HttpContext.Request.Headers;
 
-            if (!requestHeader.TryGetValue("language", out var language))
-                _defaultLanguage = Language.English;
-            else if (language.ToString().ToLower() == "en")
-                _defaultLanguage = Language.English;
-            else if (language.ToString().ToLower() == "fr")
-                _defaultLanguage = Language.French;
+            if (!headers.TryGetValue(TenantIdHeader, out var tenantIdValue) ||
+                !int.TryParse(tenantIdValue, out var tenantId))
+            {
+                context.Result = new BadRequestObjectResult("tenant-id is required and must be a valid integer.");
+                return;
+            }
+
+            TenantId = tenantId;
+
+            // Language parsing
+            if (headers.TryGetValue(LanguageHeader, out var languageValue))
+            {
+                RequestLanguage = languageValue.ToString().ToLower() switch
+                {
+                    "en" => Language.English,
+                    "fr" => Language.French,
+                    _ => Language.English
+                };
+            }
             else
-                _defaultLanguage = Language.English;
+            {
+                RequestLanguage = Language.English;
+            }
+
         }
 
-        public static object? GetNotFoundResult() => new { message = SysExpressionHelper.Get(_defaultLanguage, ExpressionTypes.SysHelp, ApiResponseExpression.ApiResponse_Not_Found.ToInt()) };
+        protected IActionResult FromApiResponse<T>(ApiResponse<T> response) => response.Success ? Ok(response) : BadRequest(response);
     }
 }

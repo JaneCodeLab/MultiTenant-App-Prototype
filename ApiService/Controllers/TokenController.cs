@@ -1,10 +1,15 @@
+using ApiService.Constants;
 using ApplicationService;
 using ApplicationService.CustomModels.ApiModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ApiService.Controllers
 {
-    [Route("api")]
+    [ApiController]
+    [ApiVersion("1.0")]
+    [Route(RouteConstants.Token)]
+    [ApiExplorerSettings(GroupName = "v1")]
     public class TokenController : Controller
     {
         private readonly ITokenService _tokenService;
@@ -13,14 +18,14 @@ namespace ApiService.Controllers
             _tokenService = tokenService;
         }
 
-        [HttpPost, Route("login")]
-        public async Task<IActionResult> Login([FromBody] TokenRequest model)
+        [HttpPost]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GenerateToken([FromBody] TokenRequest model)
         {
             var result = await _tokenService.Authenticate(model);
-            if (result.success)
-                return Ok(result.Data);
-            else
-                return BadRequest(result);
+            return result.Success ? Ok(result) : BadRequest(result);
         }
     }
 }

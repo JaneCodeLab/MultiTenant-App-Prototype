@@ -9,7 +9,7 @@ namespace Infrastructure.Helpers
 {
     public static class StringExtentions
     {
-        public static bool IsNullOrEmpty(this string? value) => string.IsNullOrEmpty(value);
+        public static bool IsNullOrEmpty(this string? value) => string.IsNullOrEmpty(value.Trim());
 
         public static int ToInt(this string source)
         {

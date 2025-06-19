@@ -13,11 +13,12 @@ namespace ApiService
             services.AddTransient<IUnitOfWork<ApplicationDbContext>, UnitOfWork<ApplicationDbContext>>();
 
             services.AddTransient<ISysTenantService, SysTenantService>();
-
             services.AddTransient<ISysApiUserService, SysApiUserService>();
-            services.AddTransient<ITokenService, TokenService>();
             services.AddTransient<ISysParameterService, SysParameterService>();
             services.AddTransient<ISysExpressionService, SysExpressionService>();
+
+            services.AddTransient<ITokenService, TokenService>();
+            services.AddTransient<ITaskApiService, TaskApiService>();
 
             return services;
         }
