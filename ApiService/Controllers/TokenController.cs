@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace ApiService.Controllers
 {
     [ApiController]
+    [SkipSwaggerHeader]
     [ApiVersion("1.0")]
     [Route(RouteConstants.Token)]
     [ApiExplorerSettings(GroupName = "v1")]

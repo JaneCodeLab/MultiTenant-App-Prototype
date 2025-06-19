@@ -1,5 +1,6 @@
 ﻿using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Reflection;
 
 namespace ApiService.Middleware;
 
@@ -9,6 +10,12 @@ public class AddHeaderOperationFilter : IOperationFilter
     private const string LanguageHeader = "language";
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
+        bool shouldSkip = context.MethodInfo.GetCustomAttribute<SkipSwaggerHeaderAttribute>() != null
+                       || context.MethodInfo.DeclaringType?.GetCustomAttribute<SkipSwaggerHeaderAttribute>() != null;
+
+        if (shouldSkip)
+            return;
+
         operation.Parameters ??= new List<OpenApiParameter>();
 
         // Add tenant-id header if not already present

@@ -1,10 +1,9 @@
 ﻿namespace ApplicationService
 {
-    public static class JwtSettings
+    public class JwtSettings
     {
-        public const string Section = "Jwt";
-        public const string Key = $"{Section}:Key";
-        public const string Issuer = $"{Section}:Issuer";
-        public const string Audience = $"{Section}:Audience";
+        public string Key { get; set; }
+        public string Issuer { get; set; }
+        public string Audience { get; set; }
     }
 }

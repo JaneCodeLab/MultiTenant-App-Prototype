@@ -15,10 +15,12 @@ namespace ApiService.Controllers
     [ApiExplorerSettings(GroupName = "v1")]
     public class TaskItemsController : BaseController
     {
+        private readonly ILogger<TaskItemsController> _logger;
         private readonly ITaskApiService _taskApiService;
-        public TaskItemsController(ITaskApiService taskApiService)
+        public TaskItemsController(ITaskApiService taskApiService, ILogger<TaskItemsController> logger)
         {
-            _taskApiService = taskApiService;
+            _taskApiService = taskApiService ?? throw new ArgumentNullException(nameof(taskApiService));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
 
