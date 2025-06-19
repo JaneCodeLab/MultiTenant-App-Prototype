@@ -4,6 +4,7 @@ using ApplicationService.Constants;
 using ApplicationService.CustomModels.ApiModels;
 using Infrastructure.Helpers;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -13,12 +14,13 @@ namespace ApplicationService;
 
 public class TokenService : ITokenService
 {
-    private readonly IConfiguration _configuration;
+    private readonly JwtSettings _jwtSettings;
     private readonly ISysApiUserService _apiUserService;
-    public TokenService(IConfiguration configuration, ISysApiUserService apiUserService)
+
+    public TokenService(IOptions<JwtSettings> jwtOptions, ISysApiUserService apiUserService)
     {
-        _configuration = configuration;
-        _apiUserService = apiUserService;
+        _jwtSettings = jwtOptions?.Value ?? throw new ArgumentNullException(nameof(jwtOptions));
+        _apiUserService = apiUserService ?? throw new ArgumentNullException(nameof(apiUserService));
     }
 
     public async Task<ApiResponse<object>> Authenticate(TokenRequest model)
@@ -27,7 +29,7 @@ public class TokenService : ITokenService
         if (!apiUserResult.Success)
             return ApiResponse<object>.Fail(ApiCommonMessages.AuthenticationFailed);
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration[JwtSettings.Key]));
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
         var expiration = DateTime.UtcNow.AddMinutes(120);
 
@@ -41,8 +43,8 @@ public class TokenService : ITokenService
         };
 
         var token = new JwtSecurityToken(
-             issuer: _configuration[JwtSettings.Issuer],
-             audience: _configuration[JwtSettings.Audience],
+            issuer: _jwtSettings.Issuer,
+            audience: _jwtSettings.Audience,
              claims: claims,
              expires: expiration,
              signingCredentials: credentials

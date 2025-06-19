@@ -43,7 +43,11 @@ builder.Services.AddCors(options =>
 // -----------------------------
 // API & Versioning
 // -----------------------------
-builder.Services.AddControllers();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<LoggingActionFilter>();
+});
 builder.Services.AddApiVersioning(opt =>
 {
     opt.DefaultApiVersion = new ApiVersion(1, 0);
@@ -90,6 +94,9 @@ builder.Services.AddSwaggerGen(options =>
 // -----------------------------
 // JWT Authentication
 // -----------------------------
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(nameof(JwtSettings)));
+var jwtSettings = builder.Configuration.GetSection(nameof(JwtSettings)).Get<JwtSettings>();
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -99,11 +106,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         {
             ValidateIssuer = true,
             ValidateAudience = true,
-            ValidAudience = builder.Configuration[JwtSettings.Audience],
-            ValidIssuer = builder.Configuration[JwtSettings.Issuer],
+            ValidAudience = jwtSettings.Audience,
+            ValidIssuer = jwtSettings.Issuer,
             RoleClaimType = ClaimTypes.Role,
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration[JwtSettings.Key])
+                Encoding.UTF8.GetBytes(jwtSettings.Key)
             )
         };
         options.Events = new JwtBearerEvents
