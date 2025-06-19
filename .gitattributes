@@ -12,6 +12,15 @@
 ###############################################################################
 #*.cs     diff=csharp
 
+# Exclude plugin JS/CSS libraries from GitHub language stats
+wwwroot/plugins/** linguist-vendored
+
+# Also exclude any minified or bundled files commonly used in plugins
+*.min.js linguist-vendored
+*.min.css linguist-vendored
+*.bundle.js linguist-vendored
+*.bundle.css linguist-vendored
+
 ###############################################################################
 # Set the merge driver for project and solution files
 #
@@ -61,3 +70,8 @@
 #*.PDF   diff=astextplain
 #*.rtf   diff=astextplain
 #*.RTF   diff=astextplain
+
+# Ignore wwwroot/lib from language stats
+wwwroot/lib/* linguist-vendored
+wwwroot/js/vendor/* linguist-vendored
+node_modules/* linguist-vendored
