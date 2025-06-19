@@ -15,6 +15,7 @@
   <ItemGroup>
     <PackageReference Include="ClosedXML" Version="0.105.0" />
     <PackageReference Include="LinqKit.Core" Version="1.2.8" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.2" />
   </ItemGroup>
 
   <ItemGroup>

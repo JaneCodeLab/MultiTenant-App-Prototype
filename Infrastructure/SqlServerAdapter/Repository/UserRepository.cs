@@ -2,7 +2,6 @@
 using ApplicationCore;
 using ApplicationCore.DomainModel;
 using Microsoft.EntityFrameworkCore;
-using Minio.DataModel;
 using System.Linq.Expressions;
 
 namespace Infrastructure.SqlServerAdapter
